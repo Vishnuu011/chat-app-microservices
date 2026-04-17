@@ -1,9 +1,11 @@
 fastapi[standard]
 uvicorn
+redis
 
 motor
 pymongo
 beanie
+aio-pika
 
 passlib
 python-jose

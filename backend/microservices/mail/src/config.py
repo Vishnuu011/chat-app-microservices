@@ -11,8 +11,8 @@ load_dotenv(
 )
 
 class Settings(BaseSettings):
-    MONGO_URI: str
-    REDIS_URL: str
+    # MONGO_URI: str
+    # REDIS_URL: str
     RABBITMQ_URL: str
     # SECRET_KEY: str
     # ALGORITHM: str
@@ -22,4 +22,4 @@ class Settings(BaseSettings):
         env_file = ".env"
 
 
-settings = Settings()    
+settings = Settings()  

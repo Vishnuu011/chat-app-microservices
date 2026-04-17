@@ -1,0 +1,5 @@
+fastapi[standard]
+fastapi-mail
+aio-pika
+python-dotenv
+redis
