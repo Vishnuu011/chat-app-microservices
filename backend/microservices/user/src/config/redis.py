@@ -10,7 +10,8 @@ async def connectRedis():
 
     try:
         redis_client=Redis.from_url(
-            settings.REDIS_URL
+            settings.REDIS_URL,
+            decode_responses=True 
         )
 
         await redis_client.ping()
@@ -29,10 +30,10 @@ async def close_redis():
         print("Redis connection closed")
 
 
-async def get_redis():
+async def get_redis() -> Redis:
     global redis_client
     if redis_client is None:
         raise Exception("Redis not connected")
 
-    return redis_client     
+    return redis_client
 
