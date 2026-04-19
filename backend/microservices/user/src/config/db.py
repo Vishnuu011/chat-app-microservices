@@ -1,4 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
+from src.model.User import UserModel
+
 from src.config.config import settings
 
 client: AsyncIOMotorClient | None = None
@@ -17,11 +19,13 @@ async def connectDB():
 
     try:
         client = AsyncIOMotorClient(url)
-        db = client["Chatappmicroserviceapp"]
+        db = client["microservices"]
 
         await client.admin.command("ping")
 
         print("MongoDB connected successfully ✅")
+
+        
 
     except Exception as e:
         print(f"Failed to connect to MongoDB: {str(e)}")
@@ -36,6 +40,9 @@ async def closeDB():
 
 
 def get_db():
+    global db
     if db is None:
         raise Exception("Database not connected")
     return db
+
+

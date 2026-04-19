@@ -10,10 +10,11 @@ connection = None
 channel = None
 
 
+
 conf = ConnectionConfig(
-    MAIL_USERNAME="your_email@gmail.com",
-    MAIL_PASSWORD="your_app_password",
-    MAIL_FROM="your_email@gmail.com",
+    MAIL_USERNAME=settings.MAIL_USERNAME,
+    MAIL_PASSWORD=settings.MAIL_PASSWORD,
+    MAIL_FROM=settings.MAIL_FROM,
     MAIL_PORT=587,
     MAIL_SERVER="smtp.gmail.com",
     MAIL_STARTTLS=True,
@@ -25,8 +26,37 @@ async def send_email(email: str, otp: str):
     message = MessageSchema(
         subject="Your OTP Code",
         recipients=[email],
-        body=f"Your OTP code is {otp}",
-        subtype="plain"
+        body=f"""
+    <html>
+        <body style="font-family: Arial; background:#f4f4f4; padding:20px;">
+            <div style="max-width:500px; margin:auto; background:white; padding:20px; border-radius:8px;">
+                
+                <h2 style="color:#333;">Chat App Login</h2>
+
+                <p>Your One Time Password is:</p>
+
+                <h1 style="
+                    background:#2563eb;
+                    color:white;
+                    padding:10px;
+                    border-radius:6px;
+                    text-align:center;
+                    letter-spacing:4px;
+                ">
+                    {otp}
+                </h1>
+
+                <p>This OTP is valid for <b>5 minutes</b>.</p>
+
+                <p style="color:gray;font-size:12px;">
+                    If you didn't request this, please ignore this email.
+                </p>
+
+            </div>
+        </body>
+    </html>
+    """,
+        subtype="html"
     )
 
     fm = FastMail(conf)
@@ -34,13 +64,17 @@ async def send_email(email: str, otp: str):
 
 
 async def process_message(message: aio_pika.IncomingMessage):
-    
+
     async with message.process():
 
         data = json.loads(message.body)
 
-        email = data["email"]
-        otp = data["otp"]
+        email = data.get("email")
+        otp = data.get("otp")
+
+        if not email or not otp:
+            print("Invalid message:", data)
+            return
 
         await send_email(email, otp)
 

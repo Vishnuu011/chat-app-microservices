@@ -4,7 +4,6 @@ redis
 
 motor
 pymongo
-beanie
 aio-pika
 
 passlib

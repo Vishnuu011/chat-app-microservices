@@ -33,7 +33,7 @@ async def startup():
 async def shutdown():
     await close_rabbitmq()    
 
-## ---- Router ---- ##
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -54,7 +54,10 @@ async def add_time(request, call_next):
 
     return response
 
-app.include_router(router=userRouter.user_router, prefix="/api/v1")    
+
+## ---- Router ---- ##
+
+app.include_router(router=userRouter.user_router, prefix="/api/v1", tags=["otp auth"])    
     
      
 if __name__=="__main__":

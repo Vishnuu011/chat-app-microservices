@@ -11,12 +11,12 @@ load_dotenv(
 )
 
 class Settings(BaseSettings):
-    # MONGO_URI: str
-    # REDIS_URL: str
+
     RABBITMQ_URL: str
-    # SECRET_KEY: str
-    # ALGORITHM: str
-    # ACCESS_TOKEN_EXPIRE_HOURS: int
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_FROM:str
+    
     
     class Config:
         env_file = ".env"

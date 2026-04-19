@@ -1,6 +1,6 @@
-from beanie import Document, Indexed
+from pydantic import BaseModel, EmailStr
 
-class UserModel(Document):
+class UserModel(BaseModel):
 
-    name =Indexed(str, unique=True)
-    email=Indexed(str, unique=True)
+    name: str
+    email: EmailStr
