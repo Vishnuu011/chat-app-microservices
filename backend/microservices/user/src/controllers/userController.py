@@ -4,8 +4,9 @@ from src.config.db import get_db, db
 from src.config.config import settings
 from fastapi import Depends, Body, HTTPException, status
 from src.schema.schema import LoginRequest, LoginResponds, VerifyOTPRequest, VerifyOTPResponds
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Any
 from src.model.User import UserModel
+from src.middlewares.isAuth import isAuth
 from datetime import datetime, timedelta
 from bson import objectid
 from jose import JWTError, jwt
@@ -136,3 +137,10 @@ async def verifyUser(
             status_code=500,
             detail=f"Error in verifyUser: {str(e)}"
         )
+    
+    
+async def myProfile(
+    is_auth: Any = Depends(isAuth)
+) -> Any: 
+    user=is_auth
+    return user

@@ -7,8 +7,9 @@ from fastapi import (
 )
 from src.config.redis import get_redis
 from src.config.db import get_db
-from src.controllers.userController import loginUser, verifyUser
-from typing import Annotated, Optional
+from src.controllers.userController import loginUser, verifyUser, myProfile
+from src.middlewares.isAuth import isAuth
+from typing import Annotated, Optional, Any
 from src.schema.schema import LoginRequest, LoginResponds, VerifyOTPResponds, VerifyOTPRequest
 
 
@@ -49,3 +50,19 @@ async def verifyRouter(
         db=db
     )
     return verify
+
+
+
+@user_router.get(
+    "/me",
+    status_code=status.HTTP_200_OK
+)
+async def myProfileRouter(
+    is_auth:Any=Depends(isAuth)
+) -> Any:
+    
+    user = await myProfile(
+        is_auth=is_auth
+    )
+
+    return user
