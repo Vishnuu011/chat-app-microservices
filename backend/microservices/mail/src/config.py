@@ -10,6 +10,8 @@ load_dotenv(
     Path(__file__).parent.parent.parent / ".env"
 )
 
+
+
 class Settings(BaseSettings):
 
     RABBITMQ_URL: str

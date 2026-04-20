@@ -251,11 +251,11 @@ async def getAllUsers(
 
    
 async def getAUser(
-    id: GetAUserRequest,
+    id: str,
     db: Any = Depends(get_db)
 ) -> Any:
     
-    id=id.id
+    id=id
     users = db["users"]
 
     user = await users.find_one(

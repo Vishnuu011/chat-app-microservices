@@ -7,14 +7,33 @@ from fastapi import (
 )
 from src.config.redis import get_redis
 from src.config.db import get_db
-from src.controllers.userController import loginUser, verifyUser, myProfile, updateName, getAllUsers, getAUser
+from src.controllers.userController import (
+    loginUser, 
+    verifyUser, 
+    myProfile, 
+    updateName, 
+    getAllUsers, 
+    getAUser
+)
 from src.middlewares.isAuth import isAuth
-from typing import Annotated, Optional, Any
-from src.schema.schema import LoginRequest, LoginResponds, VerifyOTPResponds, VerifyOTPRequest, UpdateNameRequest, UpdateNameResponds, GetAUserRequest
+from typing import Annotated, Optional, Any,Dict
+from src.schema.schema import (
+    LoginRequest, 
+    LoginResponds, 
+    VerifyOTPResponds, 
+    VerifyOTPRequest, 
+    UpdateNameRequest, 
+    UpdateNameResponds, 
+    GetAUserRequest
+
+)
+
 
 
 
 user_router=APIRouter()
+
+
 
 
 @user_router.post(
@@ -109,7 +128,7 @@ async def getAllUsersRouter(
     status_code=status.HTTP_200_OK
 ) 
 async def getAUserRouter(
-    id:GetAUserRequest,
+    id:str,
     db:Any=Depends(get_db)
 ) -> Any:
     getauser=await getAUser(
@@ -118,3 +137,4 @@ async def getAUserRouter(
     )
 
     return getauser
+
