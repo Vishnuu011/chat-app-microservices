@@ -1,0 +1,9 @@
+fastapi[standard]
+uvicorn
+motor
+pymongo
+python-jose
+httpx
+python-multipart
+email-validator
+python-socketio
