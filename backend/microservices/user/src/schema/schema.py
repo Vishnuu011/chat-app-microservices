@@ -14,3 +14,14 @@ class VerifyOTPResponds(BaseModel):
     responds: str
     userinfo: dict
     token: str    
+
+class UpdateNameRequest(BaseModel):
+    name:str   
+
+class UpdateNameResponds(BaseModel):
+    responds:str
+    user_info: dict
+    token:str   
+
+class GetAUserRequest(BaseModel):
+    id:str     

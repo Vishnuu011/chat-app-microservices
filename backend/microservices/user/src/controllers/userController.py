@@ -2,16 +2,34 @@ from src.config.rabbitmq import publishToQueue
 from src.config.redis import get_redis
 from src.config.db import get_db, db
 from src.config.config import settings
-from fastapi import Depends, Body, HTTPException, status
-from src.schema.schema import LoginRequest, LoginResponds, VerifyOTPRequest, VerifyOTPResponds
+
+from fastapi import (
+    Depends, 
+    Body, 
+    HTTPException, 
+    status
+)
+from src.schema.schema import (
+    LoginRequest, 
+    LoginResponds, 
+    VerifyOTPRequest, 
+    VerifyOTPResponds, 
+    UpdateNameResponds,
+    UpdateNameRequest,
+    GetAUserRequest
+)
+
 from typing import Annotated, Optional, Any
 from src.model.User import UserModel
 from src.middlewares.isAuth import isAuth
 from datetime import datetime, timedelta
-from bson import objectid
+from bson import ObjectId
 from jose import JWTError, jwt
 import math
 import random
+
+
+
 
 async def loginUser(
     request: LoginRequest,
@@ -134,13 +152,122 @@ async def verifyUser(
 
     except Exception as e:
         raise HTTPException(
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error in verifyUser: {str(e)}"
         )
     
     
+
 async def myProfile(
     is_auth: Any = Depends(isAuth)
 ) -> Any: 
     user=is_auth
+    return user
+
+
+
+async def updateName(
+    request: UpdateNameRequest,
+    user: dict = Depends(isAuth),
+    db = Depends(get_db)
+) -> Optional[UpdateNameResponds]:
+
+    try:
+        users = db["users"]
+
+        user_id = user["_id"]
+
+        result = await users.update_one(
+            {
+                "_id": ObjectId(user_id)
+            },
+            {
+                "$set": {
+                    "name": request.name
+                }
+            }
+        )
+
+        if result.modified_count == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Name update failed"
+            )
+
+        updated_user = await users.find_one(
+            {
+                "_id": ObjectId(user_id)
+            }
+        )
+        updated_user["_id"] = str(updated_user["_id"])
+
+        expire = datetime.utcnow() + timedelta(days=7)
+
+        new_token = jwt.encode(
+            {
+                "user_id": updated_user["_id"],
+                "email": updated_user["email"],
+                "exp": expire
+            },
+            settings.SECRET_KEY,
+            algorithm=settings.ALGORITHM
+        )
+
+        return UpdateNameResponds(
+            responds="User updated successfully",
+            user_info=updated_user,
+            token=new_token
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error in updateName: {str(e)}"
+        )
+    
+
+
+async def getAllUsers(
+    db: Any = Depends(get_db)
+) -> Any:
+    try:
+        users_collection = db["users"]
+
+        users = await users_collection.find(
+            {}
+        ).to_list(length=100)
+
+        for user in users:
+            user["_id"] = str(user["_id"])
+
+        return users
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error fetching users: {str(e)}"
+        )
+    
+
+   
+async def getAUser(
+    id: GetAUserRequest,
+    db: Any = Depends(get_db)
+) -> Any:
+    
+    id=id.id
+    users = db["users"]
+
+    user = await users.find_one(
+        {"_id": ObjectId(id)}
+    )
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    user["_id"] = str(user["_id"])
+
     return user

@@ -7,10 +7,10 @@ from fastapi import (
 )
 from src.config.redis import get_redis
 from src.config.db import get_db
-from src.controllers.userController import loginUser, verifyUser, myProfile
+from src.controllers.userController import loginUser, verifyUser, myProfile, updateName, getAllUsers, getAUser
 from src.middlewares.isAuth import isAuth
 from typing import Annotated, Optional, Any
-from src.schema.schema import LoginRequest, LoginResponds, VerifyOTPResponds, VerifyOTPRequest
+from src.schema.schema import LoginRequest, LoginResponds, VerifyOTPResponds, VerifyOTPRequest, UpdateNameRequest, UpdateNameResponds, GetAUserRequest
 
 
 
@@ -24,7 +24,7 @@ user_router=APIRouter()
 ) 
 async def loginRouter(
     request:LoginRequest, 
-    redis = Depends(get_redis)
+    redis:Any=Depends(get_redis)
 ) -> Optional[LoginResponds]:
     usercont=await loginUser(
         request=request,
@@ -41,8 +41,8 @@ async def loginRouter(
 )
 async def verifyRouter(
     request:VerifyOTPRequest,
-    redis=Depends(get_redis),
-    db=Depends(get_db)
+    redis:Any=Depends(get_redis),
+    db:Any=Depends(get_db)
 ) -> Optional[VerifyOTPResponds]:
     verify=await verifyUser(
         request=request,
@@ -66,3 +66,55 @@ async def myProfileRouter(
     )
 
     return user
+
+
+
+@user_router.post(
+    "/update/user",
+    response_model=UpdateNameResponds,
+    status_code=status.HTTP_200_OK
+)
+async def UpdateNameRouter(
+    request:UpdateNameRequest,
+    auth_user:Any=Depends(isAuth),
+    db:Any=Depends(get_db)
+) -> Optional[UpdateNameResponds]:
+    
+    updated = await updateName(
+        request=request,
+        user=auth_user,
+        db=db
+    )
+    return updated
+
+
+
+@user_router.get(
+    "/user/all",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(isAuth)]
+)
+async def getAllUsersRouter(
+    db:Any=Depends(get_db)
+):
+    getalluser=await getAllUsers(
+        db=db
+    )
+    return getalluser
+
+
+
+@user_router.get(
+    "/user/{id}",
+    status_code=status.HTTP_200_OK
+) 
+async def getAUserRouter(
+    id:GetAUserRequest,
+    db:Any=Depends(get_db)
+) -> Any:
+    getauser=await getAUser(
+        id=id,
+        db=db
+    )
+
+    return getauser
