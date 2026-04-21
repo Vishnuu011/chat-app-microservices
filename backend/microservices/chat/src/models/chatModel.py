@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 
 class LatestMessage(BaseModel):
     text: str
@@ -7,4 +7,4 @@ class LatestMessage(BaseModel):
 
 class Chat(BaseModel):
     users: List[str]
-    latestMessage: LatestMessage
+    latestMessage: Optional[LatestMessage] =None
