@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import time
 from src.config.db import connectDB, closeDB
+from src.routers import chatRouter
 import uvicorn
 
 
@@ -37,7 +38,16 @@ async def add_time(request, call_next):
 
     return response
 
+
+
+app.include_router(
+    router=chatRouter.chat_router,
+    prefix="/api/v1",
+    tags=["chat services"]
+
+)
+
     
      
 if __name__=="__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app)

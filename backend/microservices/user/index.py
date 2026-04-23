@@ -54,7 +54,6 @@ async def add_time(request, call_next):
 
     return response
 
-
 ## ---- Router ---- ##
 
 app.include_router(router=userRouter.user_router, prefix="/api/v1", tags=["otp auth"])    

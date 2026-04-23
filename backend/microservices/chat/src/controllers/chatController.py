@@ -16,7 +16,7 @@ from src.config.config import settings
 
 
 async def createNewChat(
-    data: CreateChatRequest,
+    data:CreateChatRequest,
     user: dict = Depends(isAuth),
     db: Any = Depends(get_db)
 ) -> Optional[ChatRespondsSchema]:
