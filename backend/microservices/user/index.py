@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from src.config.db import connectDB, closeDB
 from src.config.redis import connectRedis, close_redis
@@ -7,7 +7,16 @@ from src.routers import userRouter
 import time
 import uvicorn
 
-app=FastAPI()
+
+
+app=fastapi.FastAPI(
+    title="chat service API",
+    description="A simple chat API bulit with FastAPI",
+    version="1.0.0"
+)
+
+
+
 
 @app.on_event("startup")
 async def startup():
@@ -35,6 +44,8 @@ async def shutdown():
 
 
 
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
@@ -42,6 +53,8 @@ app.add_middleware(
     allow_methods=["*"],   
     allow_headers=["*"],
 )
+
+
 
 @app.middleware("http")
 async def add_time(request, call_next):
@@ -54,9 +67,17 @@ async def add_time(request, call_next):
 
     return response
 
+
+
 ## ---- Router ---- ##
 
-app.include_router(router=userRouter.user_router, prefix="/api/v1", tags=["otp auth"])    
+app.include_router(
+    router=userRouter.user_router, 
+    prefix="/api/v1", 
+    tags=["user services API Router"]
+)   
+
+
     
      
 if __name__=="__main__":

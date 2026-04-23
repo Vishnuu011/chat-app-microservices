@@ -5,8 +5,10 @@ from fastapi import (
     HTTPException,
     Body
 )
+
 from src.config.redis import get_redis
 from src.config.db import get_db
+
 from src.controllers.userController import (
     loginUser, 
     verifyUser, 
@@ -15,8 +17,10 @@ from src.controllers.userController import (
     getAllUsers, 
     getAUser
 )
+
 from src.middlewares.isAuth import isAuth
 from typing import Annotated, Optional, Any,Dict
+
 from src.schema.schema import (
     LoginRequest, 
     LoginResponds, 
@@ -25,7 +29,6 @@ from src.schema.schema import (
     UpdateNameRequest, 
     UpdateNameResponds, 
     GetAUserRequest
-
 )
 
 

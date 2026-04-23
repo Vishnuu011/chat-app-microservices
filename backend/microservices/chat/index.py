@@ -6,7 +6,17 @@ from src.routers import chatRouter
 import uvicorn
 
 
-app=FastAPI()
+
+
+
+app=FastAPI(
+    title="chat service API",
+    description="A simple chat API bulit with FastAPI",
+    version="1.0.0"
+)
+
+
+
 
 @app.on_event("startup")
 async def startup():
@@ -40,14 +50,17 @@ async def add_time(request, call_next):
 
 
 
+
+
 app.include_router(
     router=chatRouter.chat_router,
     prefix="/api/v1",
-    tags=["chat services"]
+    tags=["chat services API Router"]
 
 )
 
     
+
      
 if __name__=="__main__":
     uvicorn.run(app)

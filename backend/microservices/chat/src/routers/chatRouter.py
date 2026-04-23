@@ -1,5 +1,10 @@
 import fastapi
-from typing import Annotated, List, Optional,Any
+from typing import(
+    Annotated, 
+    List, 
+    Optional,
+    Any
+)
 from src.controllers.chatController import createNewChat
 from src.schema.schema import (
     ChatRespondsSchema,

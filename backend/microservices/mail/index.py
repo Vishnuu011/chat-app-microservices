@@ -1,16 +1,23 @@
-from fastapi import FastAPI
+import fastapi
 from src.consumer import startSendOtpConsumer
 import time
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
 
-app=FastAPI()
+app=fastapi.FastAPI(
+    title="mail service API",
+    description="A simple mail API bulit with FastAPI",
+    version="1.0.0"
+)
+
 
 
 @app.on_event("startup")
 async def startup():
     await startSendOtpConsumer()
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,6 +26,8 @@ app.add_middleware(
     allow_methods=["*"],   
     allow_headers=["*"],
 )
+
+
 
 @app.middleware("http")
 async def add_time(request, call_next):
@@ -30,6 +39,8 @@ async def add_time(request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
 
     return response    
+
+
 
 
 
