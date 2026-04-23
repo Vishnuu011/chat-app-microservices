@@ -9,6 +9,7 @@ import uvicorn
 
 
 
+
 app=fastapi.FastAPI(
     title="chat service API",
     description="A simple chat API bulit with FastAPI",

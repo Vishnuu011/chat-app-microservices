@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     # RABBITMQ_URL: str
     SECRET_KEY: str
     ALGORITHM: str
+    USER_SERVICE:str
     # ACCESS_TOKEN_EXPIRE_HOURS: int
     
     class Config:

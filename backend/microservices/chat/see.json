@@ -1,0 +1,24 @@
+{
+    "chats": [
+        {
+            "user": {
+                "id": "69e5ce34581644191615543d",
+                "name": "kannan",
+                "email": "kk7521673@gmail.com",
+                "createdat": "2026-04-20T12:26:52.533000",
+                "updatedat": "2026-04-20T06:56:52.533000"
+            },
+            "chat": {
+                "id": "69ea5d4e5d4bd1921d95476f",
+                "users": [
+                    "69e9bc663c4045756fef6a2d",
+                    "69e5ce34581644191615543d"
+                ],
+                "createdat": "2026-04-23T17:56:30.959000",
+                "updatedat": "2026-04-23T17:56:30.959000",
+                "latestMessage": null,
+                "unseencount": 0
+            }
+        }
+    ]
+}

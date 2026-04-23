@@ -165,7 +165,6 @@ async def myProfile(
     return user
 
 
-
 async def updateName(
     request: UpdateNameRequest,
     user: dict = Depends(isAuth),

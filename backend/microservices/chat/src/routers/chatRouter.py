@@ -5,10 +5,11 @@ from typing import(
     Optional,
     Any
 )
-from src.controllers.chatController import createNewChat
+from src.controllers.chatController import createNewChat, getAllChats
 from src.schema.schema import (
     ChatRespondsSchema,
-    CreateChatRequest
+    CreateChatRequest,
+    GetAllChatsResponseSchema
 )
 from src.middlewares.isAuth import isAuth
 from src.config.config import settings
@@ -40,4 +41,23 @@ async def CreateNewChatRouter(
     )
 
     return createnewchat
+
+
+
+@chat_router.get(
+    "/chat/all",
+    response_model=GetAllChatsResponseSchema,
+    status_code=fastapi.status.HTTP_200_OK
+)
+async def getAllChatsRouter(
+    is_auth_user:dict=fastapi.Depends(isAuth),
+    db:Any=fastapi.Depends(get_db)
+) -> Optional[GetAllChatsResponseSchema]:
+    
+    getAllChat=await getAllChats(
+        user=is_auth_user,
+        db=db
+    )
+
+    return getAllChat
 
