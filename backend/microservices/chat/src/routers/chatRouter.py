@@ -5,11 +5,12 @@ from typing import(
     Optional,
     Any
 )
-from src.controllers.chatController import createNewChat, getAllChats
+from src.controllers.chatController import createNewChat, getAllChats, sendMessage
 from src.schema.schema import (
     ChatRespondsSchema,
     CreateChatRequest,
-    GetAllChatsResponseSchema
+    GetAllChatsResponseSchema,
+    SendMessageResponseSchema
 )
 from src.middlewares.isAuth import isAuth
 from src.config.config import settings
@@ -60,4 +61,30 @@ async def getAllChatsRouter(
     )
 
     return getAllChat
+
+
+
+
+@chat_router.post(
+    "/message",
+    response_model=SendMessageResponseSchema,
+    status_code=fastapi.status.HTTP_201_CREATED,
+)
+async def sendMessageRouter(
+    chatId: str = fastapi.Form(...),
+    text: str | None = fastapi.Form(None),
+    imageFile: fastapi.UploadFile | None = fastapi.File(None),
+    auth_user: dict = fastapi.Depends(isAuth),
+    db:Any=fastapi.Depends(get_db)
+) -> Optional[SendMessageResponseSchema]:
+    
+    message=await sendMessage(
+        chatId=chatId,
+        text=text,
+        imageFile=imageFile,
+        auth_user=auth_user,
+        db=db
+    )
+
+    return message
 

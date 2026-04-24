@@ -38,3 +38,23 @@ class ChatItemSchema(BaseModel):
 
 class GetAllChatsResponseSchema(BaseModel):
     chats: List[ChatItemSchema]
+
+class ImageSchema(BaseModel):
+    url: str
+    publicId: str
+
+class MessageSchema(BaseModel):
+    id: str
+    chatId: str
+    sender: str
+    text: Optional[str] = None
+    image: Optional[ImageSchema] = None
+    messageType: str
+    seen: bool
+    seenAt: Optional[datetime] = None
+    createdAt: datetime
+    updatedAt: datetime
+
+class SendMessageResponseSchema(BaseModel):
+    message: MessageSchema
+    sender: str            

@@ -9,12 +9,14 @@ from src.schema.schema import (
 from src.schema.schema import *
 import asyncio
 import httpx
+from fastapi import File, UploadFile, Form
 from bson import ObjectId
 from typing import Optional
 from fastapi import HTTPException, status, Depends
 from src.middlewares.isAuth import isAuth
 from src.config.db import get_db
 from src.config.config import settings
+import cloudinary.uploader
 
 
 
@@ -156,4 +158,118 @@ async def getAllChats(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error in getAllChats: {str(e)}"
+        )
+
+
+
+async def sendMessage(
+    chatId: str = Form(...),
+    text: str | None = Form(None),
+    imageFile: UploadFile | None = File(None),
+    auth_user: dict = Depends(isAuth),
+    db=Depends(get_db)
+) -> SendMessageResponseSchema:
+
+    try:
+
+        sender_id = str(auth_user["_id"])
+
+        chats_collection = db["chats"]
+        messages_collection = db["messages"]
+
+        chat = await chats_collection.find_one(
+            {"_id": ObjectId(chatId)}
+        )
+
+        if not chat:
+            raise HTTPException(
+                status_code=404,
+                detail="Chat not found"
+            )
+
+        if sender_id not in chat["users"]:
+            raise HTTPException(
+                status_code=403,
+                detail="User not in chat"
+            )
+
+        now = datetime.utcnow()
+
+        message_data = {
+            "chatId": chatId,
+            "sender": sender_id,
+            "seen": False,
+            "seenAt": None,
+            "createdAt": now,
+            "updatedAt": now
+        }
+
+        # IMAGE MESSAGE
+        if imageFile:
+
+            upload = cloudinary.uploader.upload(
+                imageFile.file,
+                folder="chat-images"
+            )
+
+            message_data["image"] = {
+                "url": upload["secure_url"],
+                "publicId": upload["public_id"]
+            }
+
+            message_data["messageType"] = "image"
+            message_data["text"] = text or ""
+
+        else:
+
+            if not text:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Text or image required"
+                )
+
+            message_data["text"] = text
+            message_data["messageType"] = "text"
+
+        result = await messages_collection.insert_one(message_data)
+
+        message_id = str(result.inserted_id)
+
+        latest_text = "image" if imageFile else text
+
+        await chats_collection.update_one(
+            {"_id": ObjectId(chatId)},
+            {
+                "$set": {
+                    "latestMessage": {
+                        "text": latest_text,
+                        "sender": sender_id
+                    },
+                    "updatedAt": now
+                }
+            }
+        )
+
+        message_schema = MessageSchema(
+            id=message_id,
+            chatId=chatId,
+            sender=sender_id,
+            text=message_data.get("text"),
+            image=message_data.get("image"),
+            messageType=message_data["messageType"],
+            seen=False,
+            seenAt=None,
+            createdAt=now,
+            updatedAt=now
+        )
+
+        return SendMessageResponseSchema(
+            message=message_schema,
+            sender=sender_id
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error in sendMessage: {str(e)}"
         )
