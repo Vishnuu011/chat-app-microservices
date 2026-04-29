@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 import time
 from src.config.db import connectDB, closeDB
@@ -37,6 +37,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+
 @app.middleware("http")
 async def add_time(request, call_next):
     start = time.time()
@@ -59,7 +61,13 @@ app.include_router(
 
 )
 
-    
+
+@app.get(
+    "/health",
+    status_code=status.HTTP_200_OK
+)   
+async def healthCheck():
+    return {"message":"chat service is healthy"}
 
      
 if __name__=="__main__":

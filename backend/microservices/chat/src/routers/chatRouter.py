@@ -5,12 +5,14 @@ from typing import(
     Optional,
     Any
 )
-from src.controllers.chatController import createNewChat, getAllChats, sendMessage
+from src.controllers.chatController import createNewChat, getAllChats, sendMessage, getMessagesByChat
 from src.schema.schema import (
     ChatRespondsSchema,
     CreateChatRequest,
     GetAllChatsResponseSchema,
-    SendMessageResponseSchema
+    SendMessageResponseSchema,
+    GetMessagesRequestSchema,
+    GetMessagesResponseSchema
 )
 from src.middlewares.isAuth import isAuth
 from src.config.config import settings
@@ -88,3 +90,23 @@ async def sendMessageRouter(
 
     return message
 
+
+
+@chat_router.get(
+    "/messages/{chatId}",
+    response_model=GetMessagesResponseSchema,
+    status_code=fastapi.status.HTTP_200_OK
+)
+async def getMessagesByChatRouter(
+    chatId: str,
+    auth_user: dict = fastapi.Depends(isAuth),
+    db=fastapi.Depends(get_db)
+) -> Optional[GetMessagesResponseSchema]:
+    
+    messages=await getMessagesByChat(
+        chatId=chatId,
+        auth_user=auth_user,
+        db=db
+    )
+
+    return messages

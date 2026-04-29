@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Literal, Optional, List,Dict
+from typing import Any, Literal, Optional, List,Dict
 from datetime import datetime
 
 
@@ -57,4 +57,12 @@ class MessageSchema(BaseModel):
 
 class SendMessageResponseSchema(BaseModel):
     message: MessageSchema
-    sender: str            
+    sender: str    
+
+class GetMessagesResponseSchema(BaseModel):
+    messages: List[MessageSchema]
+    user: Dict[str, Any]            
+
+class GetMessagesRequestSchema(BaseModel):
+    chatId: str
+        

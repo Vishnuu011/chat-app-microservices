@@ -273,3 +273,107 @@ async def sendMessage(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error in sendMessage: {str(e)}"
         )
+
+
+
+
+async def getMessagesByChat(
+    chatId: str,
+    auth_user: dict = Depends(isAuth),
+    db=Depends(get_db)
+) -> GetMessagesResponseSchema:
+
+    try:
+        user_id = str(auth_user["_id"])
+
+        chats_collection = db["chats"]
+        messages_collection = db["messages"]
+
+        # 1️⃣ Get chat
+        chat = await chats_collection.find_one(
+            {"_id": ObjectId(chatId.chatId)}
+        )
+
+        if not chat:
+            raise HTTPException(
+                status_code=404,
+                detail="Chat not found"
+            )
+
+        # 2️⃣ Check user in chat
+        if user_id not in chat["users"]:
+            raise HTTPException(
+                status_code=403,
+                detail="User not in this chat"
+            )
+
+        # 3️⃣ Mark messages as seen
+        await messages_collection.update_many(
+            {
+                "chatId": chatId.chatId,
+                "sender": {"$ne": user_id},
+                "seen": False
+            },
+            {
+                "$set": {
+                    "seen": True,
+                    "seenAt": datetime.utcnow()
+                }
+            }
+        )
+
+        # 4️⃣ Get messages
+        messages_cursor = messages_collection.find(
+            {"chatId": chatId}
+        ).sort("createdAt", 1)
+
+        messages = await messages_cursor.to_list(length=None)
+
+        message_items = []
+
+        for msg in messages:
+            message_items.append(
+                MessageSchema(
+                    id=str(msg["_id"]),
+                    chatId=msg["chatId"],
+                    sender=msg["sender"],
+                    text=msg.get("text"),
+                    image=msg.get("image"),
+                    messageType=msg["messageType"],
+                    seen=msg["seen"],
+                    seenAt=msg.get("seenAt"),
+                    createdAt=msg["createdAt"],
+                    updatedAt=msg["updatedAt"]
+                )
+            )
+
+        # 5️⃣ Get other user
+        other_user_id = None
+        for uid in chat["users"]:
+            if uid != user_id:
+                other_user_id = uid
+                break
+
+        if not other_user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="No other user found"
+            )
+
+        # 6️⃣ Call user service
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                f"{settings.USER_SERVICE}/api/v1/user/{other_user_id}"
+            )
+            user_data = response.json()
+
+        return GetMessagesResponseSchema(
+            messages=message_items,
+            user=user_data
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error in getMessagesByChat: {str(e)}"
+        )
