@@ -16,6 +16,9 @@ from fastapi import HTTPException, status, Depends
 from src.middlewares.isAuth import isAuth
 from src.config.db import get_db
 from src.config.config import settings
+import cloudinary
+import src.config.cloudinary
+
 import cloudinary.uploader
 
 
@@ -207,7 +210,8 @@ async def sendMessage(
         # IMAGE MESSAGE
         if imageFile:
 
-            upload = cloudinary.uploader.upload(
+            upload = await asyncio.to_thread(
+                cloudinary.uploader.upload,
                 imageFile.file,
                 folder="chat-images"
             )
@@ -291,7 +295,7 @@ async def getMessagesByChat(
 
         # 1️⃣ Get chat
         chat = await chats_collection.find_one(
-            {"_id": ObjectId(chatId.chatId)}
+            {"_id": ObjectId(chatId)}
         )
 
         if not chat:
@@ -310,7 +314,7 @@ async def getMessagesByChat(
         # 3️⃣ Mark messages as seen
         await messages_collection.update_many(
             {
-                "chatId": chatId.chatId,
+                "chatId": chatId,
                 "sender": {"$ne": user_id},
                 "seen": False
             },

@@ -6,21 +6,22 @@ from pathlib import Path
 
 
 
-load_dotenv(
-    Path(__file__).parent.parent.parent / ".env"
-)
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class Settings(BaseSettings):
+
     MONGO_URI: str
-    # REDIS_URL: str
-    # RABBITMQ_URL: str
     SECRET_KEY: str
     ALGORITHM: str
-    USER_SERVICE:str
-    # ACCESS_TOKEN_EXPIRE_HOURS: int
-    
-    class Config:
-        env_file = ".env"
+    USER_SERVICE: str
+
+    CLOUD_NAME: str
+    API_KEY: str
+    API_SECRET: str
+
+    model_config = SettingsConfigDict(env_file=".env")
+
 
 
 settings = Settings()    
