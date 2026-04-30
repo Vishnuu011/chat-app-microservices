@@ -4,7 +4,8 @@ import time
 from src.config.db import connectDB, closeDB
 from src.routers import chatRouter
 import uvicorn
-
+import socketio
+from src.socket.socket_app import sio
 
 
 
@@ -15,6 +16,10 @@ app=FastAPI(
     version="1.0.0"
 )
 
+socket_app = socketio.ASGIApp(
+    sio,
+    other_asgi_app=app
+)
 
 
 
@@ -63,12 +68,19 @@ app.include_router(
 
 
 @app.get(
-    "/health",
+    "/",
     status_code=status.HTTP_200_OK
 )   
 async def healthCheck():
-    return {"message":"chat service is healthy"}
+    return {
+        "message":"chat service is healthy"
+    }
 
      
-if __name__=="__main__":
-    uvicorn.run(app)
+if __name__ == "__main__":
+    uvicorn.run(
+        "index:socket_app",
+        host="0.0.0.0",
+        port=8002,
+        reload=True
+    )

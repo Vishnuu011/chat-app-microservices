@@ -39,30 +39,38 @@ class ChatItemSchema(BaseModel):
 class GetAllChatsResponseSchema(BaseModel):
     chats: List[ChatItemSchema]
 
-class ImageSchema(BaseModel):
+
+class FileSchema(BaseModel):
     url: str
     publicId: str
+    fileName: Optional[str] = None
+    format: Optional[str] = None
+    size: Optional[int] = None
+
 
 class MessageSchema(BaseModel):
     id: str
     chatId: str
     sender: str
     text: Optional[str] = None
-    image: Optional[ImageSchema] = None
+
+    file: Optional[FileSchema] = None
+
     messageType: str
     seen: bool
     seenAt: Optional[datetime] = None
     createdAt: datetime
     updatedAt: datetime
 
+
 class SendMessageResponseSchema(BaseModel):
     message: MessageSchema
-    sender: str    
+    sender: str
+
 
 class GetMessagesResponseSchema(BaseModel):
     messages: List[MessageSchema]
     user: Dict[str, Any]            
 
-class GetMessagesRequestSchema(BaseModel):
-    chatId: str
+
         

@@ -1,4 +1,3 @@
-
 {
     "messages": [
         {
@@ -7,6 +6,7 @@
             "sender": "69e9bc663c4045756fef6a2d",
             "text": "hii",
             "image": null,
+            "file": null,
             "messageType": "text",
             "seen": false,
             "seenAt": null,
@@ -22,6 +22,7 @@
                 "url": "https://res.cloudinary.com/dmun86mqa/image/upload/v1777477023/chat-images/hh3fvjtxgqffih65j4tj.jpg",
                 "publicId": "chat-images/hh3fvjtxgqffih65j4tj"
             },
+            "file": null,
             "messageType": "image",
             "seen": false,
             "seenAt": null,
@@ -37,11 +38,82 @@
                 "url": "https://res.cloudinary.com/dmun86mqa/image/upload/v1777477348/chat-images/wfymlxucozbuuyu8aufm.jpg",
                 "publicId": "chat-images/wfymlxucozbuuyu8aufm"
             },
+            "file": null,
             "messageType": "image",
             "seen": false,
             "seenAt": null,
             "createdAt": "2026-04-29T15:42:28.118000",
             "updatedAt": "2026-04-29T15:42:28.118000"
+        },
+        {
+            "id": "69f24ed4f5111191e2f0f924",
+            "chatId": "69ea5d4e5d4bd1921d95476f",
+            "sender": "69e9bc663c4045756fef6a2d",
+            "text": "",
+            "image": null,
+            "file": {
+                "url": "https://res.cloudinary.com/dmun86mqa/image/upload/v1777487572/chat-files/stream_sfouol.pdf",
+                "publicId": "chat-files/stream_sfouol",
+                "fileName": "file-sample_150kB.pdf",
+                "format": "pdf",
+                "size": 142786
+            },
+            "messageType": "document",
+            "seen": false,
+            "seenAt": null,
+            "createdAt": "2026-04-29T18:32:49.104000",
+            "updatedAt": "2026-04-29T18:32:49.104000"
+        },
+        {
+            "id": "69f24f1cf5111191e2f0f925",
+            "chatId": "69ea5d4e5d4bd1921d95476f",
+            "sender": "69e9bc663c4045756fef6a2d",
+            "text": "",
+            "image": null,
+            "file": {
+                "url": "https://res.cloudinary.com/dmun86mqa/video/upload/v1777487643/chat-files/tmp5s8msog5_znnscq.mp4",
+                "publicId": "chat-files/tmp5s8msog5_znnscq",
+                "fileName": "6131501-uhd_2160_3840_25fps.mp4",
+                "format": "mp4",
+                "size": 8507618
+            },
+            "messageType": "video",
+            "seen": false,
+            "seenAt": null,
+            "createdAt": "2026-04-29T18:34:01.501000",
+            "updatedAt": "2026-04-29T18:34:01.501000"
+        },
+        {
+            "id": "69f24fb1f5111191e2f0f926",
+            "chatId": "69ea5d4e5d4bd1921d95476f",
+            "sender": "69e9bc663c4045756fef6a2d",
+            "text": "hii hello",
+            "image": null,
+            "file": null,
+            "messageType": "text",
+            "seen": false,
+            "seenAt": null,
+            "createdAt": "2026-04-29T18:36:33.574000",
+            "updatedAt": "2026-04-29T18:36:33.574000"
+        },
+        {
+            "id": "69f2544ae046e6154c871ff2",
+            "chatId": "69ea5d4e5d4bd1921d95476f",
+            "sender": "69e9bc663c4045756fef6a2d",
+            "text": "hii hello",
+            "image": null,
+            "file": {
+                "url": "https://res.cloudinary.com/dmun86mqa/video/upload/v1777488969/chat-files/tmpdhdj6aqu_ht0fmc.mp4",
+                "publicId": "chat-files/tmpdhdj6aqu_ht0fmc",
+                "fileName": "6131501-uhd_2160_3840_25fps.mp4",
+                "format": "mp4",
+                "size": 8507618
+            },
+            "messageType": "video",
+            "seen": false,
+            "seenAt": null,
+            "createdAt": "2026-04-29T18:56:04.550000",
+            "updatedAt": "2026-04-29T18:56:04.550000"
         }
     ],
     "user": {

@@ -43,12 +43,17 @@ async def add_time(request, call_next):
 
 
 @app.get(
-        "/health",
+        "/",
         status_code=fastapi.status.HTTP_200_OK
     )
 async def healthCheck():
     return {"message":"mail service is healthy"}
 
 
-if __name__=="__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+if __name__ == "__main__":
+    uvicorn.run(
+        "index:app",
+        host="0.0.0.0",
+        port=8001,
+        reload=True
+    )

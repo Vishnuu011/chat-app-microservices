@@ -5,13 +5,19 @@ from typing import(
     Optional,
     Any
 )
-from src.controllers.chatController import createNewChat, getAllChats, sendMessage, getMessagesByChat
+from src.controllers.chatController import (
+    createNewChat, 
+    getAllChats, 
+    sendMessage, 
+    getMessagesByChat
+)
+
 from src.schema.schema import (
     ChatRespondsSchema,
     CreateChatRequest,
     GetAllChatsResponseSchema,
     SendMessageResponseSchema,
-    GetMessagesRequestSchema,
+    
     GetMessagesResponseSchema
 )
 from src.middlewares.isAuth import isAuth
@@ -75,7 +81,7 @@ async def getAllChatsRouter(
 async def sendMessageRouter(
     chatId: str = fastapi.Form(...),
     text: str | None = fastapi.Form(None),
-    imageFile: fastapi.UploadFile | None = fastapi.File(None),
+    File: fastapi.UploadFile | None = fastapi.File(None),
     auth_user: dict = fastapi.Depends(isAuth),
     db:Any=fastapi.Depends(get_db)
 ) -> Optional[SendMessageResponseSchema]:
@@ -83,7 +89,7 @@ async def sendMessageRouter(
     message=await sendMessage(
         chatId=chatId,
         text=text,
-        imageFile=imageFile,
+        File=File,
         auth_user=auth_user,
         db=db
     )

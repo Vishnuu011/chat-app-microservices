@@ -1,5 +1,5 @@
 from src.models.chatModel import Chat
-from src.models.messagesModel import IMessageModel
+
 from typing import Annotated,Any
 from bson import ObjectId
 from src.schema.schema import (
@@ -20,6 +20,12 @@ import cloudinary
 import src.config.cloudinary
 
 import cloudinary.uploader
+
+from src.socket.socket_app import (
+    get_receiver_socket_id, 
+    is_user_in_room, 
+    sio
+)
 
 
 
@@ -83,6 +89,7 @@ async def createNewChat(
             detail=f"Error in createNewChat: {str(e)}"
         )
     
+
 
 
 async def getAllChats(
@@ -165,10 +172,11 @@ async def getAllChats(
 
 
 
+
 async def sendMessage(
     chatId: str = Form(...),
     text: str | None = Form(None),
-    imageFile: UploadFile | None = File(None),
+    File: UploadFile | None = File(None),
     auth_user: dict = Depends(isAuth),
     db=Depends(get_db)
 ) -> SendMessageResponseSchema:
@@ -186,14 +194,29 @@ async def sendMessage(
 
         if not chat:
             raise HTTPException(
-                status_code=404,
+                status_code=status.HTTP_404_NOT_FOUND,
                 detail="Chat not found"
             )
 
         if sender_id not in chat["users"]:
             raise HTTPException(
-                status_code=403,
+                status_code=status.HTTP_403_FORBIDDEN,
                 detail="User not in chat"
+            )
+        other_user_id = next(
+            uid for uid in chat["users"] if uid != sender_id
+        )
+
+        receiverSocketId = get_receiver_socket_id(
+            str(other_user_id)
+        )
+
+        isReceiverInChatRoom = False
+
+        if receiverSocketId:
+            isReceiverInChatRoom = is_user_in_room(
+                receiverSocketId, 
+                chatId
             )
 
         now = datetime.utcnow()
@@ -201,45 +224,61 @@ async def sendMessage(
         message_data = {
             "chatId": chatId,
             "sender": sender_id,
-            "seen": False,
-            "seenAt": None,
+            "seen": isReceiverInChatRoom,
+            "seenAt": now if isReceiverInChatRoom else None,
             "createdAt": now,
             "updatedAt": now
         }
 
-        # IMAGE MESSAGE
-        if imageFile:
+        # FILE MESSAGE
+        if File:
+
+            content_type = File.content_type or ""
+
+            if "image" in content_type:
+                message_type = "image"
+            elif "video" in content_type:
+                message_type = "video"
+            else:
+                message_type = "document"
 
             upload = await asyncio.to_thread(
                 cloudinary.uploader.upload,
-                imageFile.file,
-                folder="chat-images"
+                File.file,
+                folder="chat-files",
+                resource_type="auto",
+                use_filename=True
             )
 
-            message_data["image"] = {
+            message_data["file"] = {
                 "url": upload["secure_url"],
-                "publicId": upload["public_id"]
+                "publicId": upload["public_id"],
+                "fileName": File.filename,
+                "format": upload.get("format"),
+                "size": upload.get("bytes")
             }
 
-            message_data["messageType"] = "image"
+            message_data["messageType"] = message_type
             message_data["text"] = text or ""
 
         else:
 
             if not text:
                 raise HTTPException(
-                    status_code=400,
-                    detail="Text or image required"
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Text or file required"
                 )
 
             message_data["text"] = text
             message_data["messageType"] = "text"
 
-        result = await messages_collection.insert_one(message_data)
+        result=await messages_collection.insert_one(
+            message_data
+        )
 
         message_id = str(result.inserted_id)
 
-        latest_text = "image" if imageFile else text
+        latest_text = "file" if File else text
 
         await chats_collection.update_one(
             {"_id": ObjectId(chatId)},
@@ -259,13 +298,53 @@ async def sendMessage(
             chatId=chatId,
             sender=sender_id,
             text=message_data.get("text"),
-            image=message_data.get("image"),
+            file=message_data.get("file"),
             messageType=message_data["messageType"],
-            seen=False,
-            seenAt=None,
+            seen=isReceiverInChatRoom,
+            seenAt=now if isReceiverInChatRoom else None,
             createdAt=now,
             updatedAt=now
         )
+
+        # EMIT MESSAGE TO CHAT ROOM
+        await sio.emit(
+            "newMessage",
+            message_schema.model_dump(),
+            room=chatId
+        )
+
+        # EMIT DIRECTLY TO RECEIVER
+        if receiverSocketId:
+            await sio.emit(
+                "newMessage",
+                message_schema.model_dump(),
+                room=receiverSocketId
+            )
+
+        # EMIT BACK TO SENDER
+        senderSocketId=get_receiver_socket_id(
+            sender_id
+        )
+
+        if senderSocketId:
+            await sio.emit(
+                "newMessage",
+                message_schema.model_dump(),
+                room=senderSocketId
+            )
+
+        # MESSAGE SEEN EVENT
+        if isReceiverInChatRoom:
+
+            await sio.emit(
+                "messageSeen",
+                {
+                    "chatId": chatId,
+                    "seenBy": str(other_user_id),
+                    "messageId": [message_id]
+                },
+                room=chatId
+            )       
 
         return SendMessageResponseSchema(
             message=message_schema,
@@ -277,6 +356,7 @@ async def sendMessage(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error in sendMessage: {str(e)}"
         )
+
 
 
 
@@ -293,7 +373,7 @@ async def getMessagesByChat(
         chats_collection = db["chats"]
         messages_collection = db["messages"]
 
-        # 1️⃣ Get chat
+        #Get chat
         chat = await chats_collection.find_one(
             {"_id": ObjectId(chatId)}
         )
@@ -304,14 +384,14 @@ async def getMessagesByChat(
                 detail="Chat not found"
             )
 
-        # 2️⃣ Check user in chat
+        # Check user in chat
         if user_id not in chat["users"]:
             raise HTTPException(
                 status_code=403,
                 detail="User not in this chat"
             )
 
-        # 3️⃣ Mark messages as seen
+        #Mark messages as seen
         await messages_collection.update_many(
             {
                 "chatId": chatId,
@@ -326,12 +406,14 @@ async def getMessagesByChat(
             }
         )
 
-        # 4️⃣ Get messages
+        # Get messages
         messages_cursor = messages_collection.find(
             {"chatId": chatId}
         ).sort("createdAt", 1)
 
-        messages = await messages_cursor.to_list(length=None)
+        messages = await messages_cursor.to_list(
+            length=None
+        )
 
         message_items = []
 
@@ -341,8 +423,8 @@ async def getMessagesByChat(
                     id=str(msg["_id"]),
                     chatId=msg["chatId"],
                     sender=msg["sender"],
-                    text=msg.get("text"),
-                    image=msg.get("image"),
+                    text=msg.get("text"),        
+                    file=msg.get("file"),        
                     messageType=msg["messageType"],
                     seen=msg["seen"],
                     seenAt=msg.get("seenAt"),
@@ -351,7 +433,7 @@ async def getMessagesByChat(
                 )
             )
 
-        # 5️⃣ Get other user
+        #Get other user
         other_user_id = None
         for uid in chat["users"]:
             if uid != user_id:
@@ -364,7 +446,7 @@ async def getMessagesByChat(
                 detail="No other user found"
             )
 
-        # 6️⃣ Call user service
+        # Get other user
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 f"{settings.USER_SERVICE}/api/v1/user/{other_user_id}"
