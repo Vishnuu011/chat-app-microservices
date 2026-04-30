@@ -391,40 +391,52 @@ async def getMessagesByChat(
                 detail="User not in this chat"
             )
 
-        #Mark messages as seen
-        await messages_collection.update_many(
+        # Find unseen messages
+        messages_to_mark_seen = await messages_collection.find(
             {
                 "chatId": chatId,
                 "sender": {"$ne": user_id},
                 "seen": False
-            },
-            {
-                "$set": {
-                    "seen": True,
-                    "seenAt": datetime.utcnow()
-                }
             }
-        )
+        ).to_list(length=None)
+
+        message_ids = [str(m["_id"]) for m in messages_to_mark_seen]
+
+        # Mark messages as seen
+        if message_ids:
+
+            await messages_collection.update_many(
+                {
+                    "_id": {
+                        "$in": [ObjectId(mid) for mid in message_ids]
+                    }
+                },
+                {
+                    "$set": {
+                        "seen": True,
+                        "seenAt": datetime.utcnow()
+                    }
+                }
+            )
 
         # Get messages
         messages_cursor = messages_collection.find(
             {"chatId": chatId}
         ).sort("createdAt", 1)
 
-        messages = await messages_cursor.to_list(
-            length=None
-        )
+        messages = await messages_cursor.to_list(length=None)
 
         message_items = []
 
         for msg in messages:
+
             message_items.append(
                 MessageSchema(
                     id=str(msg["_id"]),
                     chatId=msg["chatId"],
                     sender=msg["sender"],
-                    text=msg.get("text"),        
-                    file=msg.get("file"),        
+                    text=msg.get("text"),
+                    file=msg.get("file"),
                     messageType=msg["messageType"],
                     seen=msg["seen"],
                     seenAt=msg.get("seenAt"),
@@ -433,8 +445,9 @@ async def getMessagesByChat(
                 )
             )
 
-        #Get other user
+        # Get other user
         other_user_id = None
+
         for uid in chat["users"]:
             if uid != user_id:
                 other_user_id = uid
@@ -442,16 +455,37 @@ async def getMessagesByChat(
 
         if not other_user_id:
             raise HTTPException(
-                status_code=400,
+                status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No other user found"
             )
 
-        # Get other user
+        # Fetch other user details
         async with httpx.AsyncClient() as client:
+
             response = await client.get(
                 f"{settings.USER_SERVICE}/api/v1/user/{other_user_id}"
             )
+
             user_data = response.json()
+
+        # SOCKET: notify sender messages are seen
+        if message_ids:
+
+            otherUserSocketId = get_receiver_socket_id(
+                str(other_user_id)
+            )
+
+            if otherUserSocketId:
+
+                await sio.emit(
+                    "messageSeen",
+                    {
+                        "chatId": chatId,
+                        "seenBy": user_id,
+                        "messageId": message_ids
+                    },
+                    room=otherUserSocketId
+                )
 
         return GetMessagesResponseSchema(
             messages=message_items,
@@ -459,6 +493,7 @@ async def getMessagesByChat(
         )
 
     except Exception as e:
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error in getMessagesByChat: {str(e)}"
