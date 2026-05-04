@@ -6,11 +6,11 @@ sio = socketio.AsyncServer(
     cors_allowed_origins="*",
 )
 
-user_socket_map: dict[str, str] = {}
+user_socket_map: dict[str, set[str]] = {}
 
 
 def get_receiver_socket_id(user_id: str):
-    return user_socket_map.get(user_id)
+    return list(user_socket_map.get(user_id, []))
 
 
 def is_user_in_room(sid: str, room: str) -> bool:
@@ -33,7 +33,10 @@ async def connect(sid, environ, auth):
 
     if user_id:
 
-        user_socket_map[user_id] = sid
+        if user_id not in user_socket_map:
+            user_socket_map[user_id] = set()    
+
+        user_socket_map[user_id].add(sid)
 
         await sio.enter_room(sid, user_id)
 
@@ -110,7 +113,9 @@ async def disconnect(sid):
 
     if user_id:
 
-        del user_socket_map[user_id]
+        user_socket_map[user_id].discard(sid)
+        if not user_socket_map[user_id]:
+            del user_socket_map[user_id]
 
         await sio.emit(
             "getOnlineUsers",

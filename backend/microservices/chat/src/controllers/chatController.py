@@ -2,6 +2,7 @@ from src.models.chatModel import Chat
 
 from typing import Annotated,Any
 from bson import ObjectId
+from datetime import datetime
 from src.schema.schema import (
     ChatRespondsSchema,
     CreateChatRequest,
@@ -20,6 +21,7 @@ import cloudinary
 import src.config.cloudinary
 
 import cloudinary.uploader
+from fastapi.encoders import jsonable_encoder
 
 from src.socket.socket_app import (
     get_receiver_socket_id, 
@@ -105,7 +107,7 @@ async def getAllChats(
 
         chats_cursor = chats_collection.find(
             {"users": user_id}
-        ).sort("updatedat", -1)
+        ).sort("updatedAt", -1)
 
         chats = await chats_cursor.to_list(length=None)
 
@@ -138,8 +140,8 @@ async def getAllChats(
                     "_id": other_user_id,
                     "name": "unknown",
                     "email": "",
-                    "createdat": "",
-                    "updatedat": ""
+                    "created_at": "",
+                    "updated_at": ""
                 }
 
             chat_items.append(
@@ -148,14 +150,14 @@ async def getAllChats(
                         id=user_data.get("_id"),
                         name=user_data.get("name"),
                         email=user_data.get("email"),
-                        createdat=user_data.get("created_at"),
-                        updatedat=user_data.get("updated_at")
+                        created_at=user_data.get("created_at"),
+                        updated_at=user_data.get("updated_at")
                     ),
                     chat=ChatSchema(
                         id=str(chat["_id"]),
                         users=chat.get("users", []),
-                        createdat=chat.get("createdAt"),
-                        updatedat=chat.get("updatedAt"),
+                        createdAt=chat.get("createdAt"),
+                        updatedAt=chat.get("updatedAt"),
                         latestMessage=chat.get("latestMessage"),
                         unseencount=unseen_count
                     )
@@ -309,29 +311,29 @@ async def sendMessage(
         # EMIT MESSAGE TO CHAT ROOM
         await sio.emit(
             "newMessage",
-            message_schema.model_dump(),
+            jsonable_encoder(message_schema),
             room=chatId
         )
 
-        # EMIT DIRECTLY TO RECEIVER
-        if receiverSocketId:
-            await sio.emit(
-                "newMessage",
-                message_schema.model_dump(),
-                room=receiverSocketId
-            )
+        # # EMIT DIRECTLY TO RECEIVER
+        # if receiverSocketId:
+        #     await sio.emit(
+        #         "newMessage",
+        #         jsonable_encoder(message_schema),
+        #         room=receiverSocketId
+        #     )
 
-        # EMIT BACK TO SENDER
-        senderSocketId=get_receiver_socket_id(
-            sender_id
-        )
+        # # EMIT BACK TO SENDER
+        # senderSocketId=get_receiver_socket_id(
+        #     sender_id
+        # )
 
-        if senderSocketId:
-            await sio.emit(
-                "newMessage",
-                message_schema.model_dump(),
-                room=senderSocketId
-            )
+        # if senderSocketId:
+        #     await sio.emit(
+        #         "newMessage",
+        #         jsonable_encoder(message_schema),
+        #         room=senderSocketId
+        #     )
 
         # MESSAGE SEEN EVENT
         if isReceiverInChatRoom:

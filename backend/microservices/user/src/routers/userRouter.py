@@ -1,3 +1,4 @@
+from bson import ObjectId
 from fastapi import (
     APIRouter,
     Depends,
@@ -141,3 +142,29 @@ async def getAUserRouter(
 
     return getauser
 
+@user_router.post("/public-key")
+async def upload_public_key(auth_user=Depends(isAuth), db=Depends(get_db)):
+
+    user_id = str(auth_user["_id"])
+    public_key = auth_user.get("publicKey")
+
+    await db["users"].update_one(
+        {"_id": ObjectId(user_id)},
+        {"$set": {"publicKey": public_key}}
+    )
+
+    return {"message": "Public key stored"}
+
+
+
+@user_router.get("/public-key/{user_id}")
+async def get_public_key(user_id: str, db=Depends(get_db)):
+
+    user = await db["users"].find_one({"_id": ObjectId(user_id)})
+
+    if not user:
+        return {"error": "User not found"}
+
+    return {
+        "publicKey": user.get("publicKey")
+    }

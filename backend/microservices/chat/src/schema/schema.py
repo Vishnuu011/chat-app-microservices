@@ -18,15 +18,15 @@ class UserSchema(BaseModel):
     id: str
     name: str
     email: Optional[str] = None
-    createdat: Optional[datetime] = None
-    updatedat: Optional[datetime] = None
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
 
 
 class ChatSchema(BaseModel):
     id: str
     users: List[str]
-    createdat: Optional[datetime] = None
-    updatedat: Optional[datetime] = None
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
     latestMessage: Optional[Dict] = None
     unseencount: int
 
