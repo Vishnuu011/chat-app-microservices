@@ -24,6 +24,8 @@ class StartCallRequest(BaseModel):
 
 class CallResponse(BaseModel):
 
+    message: str
+
     callId: str
     callerId: str
     receiverId: str

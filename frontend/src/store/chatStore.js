@@ -8,7 +8,7 @@ export const useChatStore = create((set, get) => ({
   typingUsers:    {},     // { chatId: bool }
 
   setChats:        (chats)        => set({ chats }),
-  setActiveChat:   (chat)         => set({ activeChat: chat, messages: [] }),
+  setActiveChat: (chat) => set({ activeChat: chat }),
   setMessages:     (messages)     => set({ messages }),
   setOnlineUsers:  (ids)          => set({ onlineUsers: ids }),
 

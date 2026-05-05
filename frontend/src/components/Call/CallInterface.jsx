@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useNavigate }    from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Mic, MicOff, Video, VideoOff, PhoneOff, ShieldCheck } from 'lucide-react'
-import { useCallStore }   from '../../store/callStore.js'
-import { useAuthStore }   from '../../store/authStore.js'
-import { useWebRTC }      from '../../hooks/useWebRTC.js'
-import { callAPI }        from '../../services/api/callService.js'
-import { getCallSocket }  from '../../services/socket/socketManager.js'
-import toast              from 'react-hot-toast'
+import { useCallStore } from '../../store/callStore.js'
+import { useAuthStore } from '../../store/authStore.js'
+import { useWebRTC } from '../../hooks/useWebRTC.js'
+import { callAPI } from '../../services/api/callService.js'
+import { getCallSocket } from '../../services/socket/socketManager.js'
+import toast from 'react-hot-toast'
 
 export default function CallInterface() {
   const navigate = useNavigate()
@@ -16,32 +16,58 @@ export default function CallInterface() {
     toggleMute, toggleCamera, endActiveCall,
     setCallDuration, setLocalStream,
   } = useCallStore()
-  const { user }     = useAuthStore()
+  const { user } = useAuthStore()
   const { initiateCall, stopMedia } = useWebRTC()
 
-  const localVideoRef  = useRef()
+  const localVideoRef = useRef()
   const remoteVideoRef = useRef()
-  const timerRef       = useRef()
+  const timerRef = useRef()
 
   const isVideo = activeCall?.callType === 'video'
 
   useEffect(() => {
-    if (!activeCall) { navigate('/calls'); return }
-
-    // Start media + WebRTC
-    const isCaller = activeCall.callerId === (user.id || user._id)
-    if (isCaller) {
-      initiateCall(activeCall.receiverId, activeCall.callType).catch(() => {
-        toast.error('Could not access media devices')
-      })
+    if (!activeCall) {
+      navigate('/calls')
+      return
     }
 
-    // Duration timer
+    const start = async () => {
+      const isCaller = activeCall.callerId === (user.id || user._id)
+
+      try {
+
+        if (isCaller) {
+          await initiateCall(activeCall.receiverId, activeCall.callType)
+        } else {
+          // RECEIVER MUST ALSO START MEDIA
+          const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: activeCall.callType === "video"
+          })
+
+          setLocalStream(stream)
+
+          const pc = useCallStore.getState().peerConnection
+
+          if (pc) {
+            stream.getTracks().forEach(track => pc.addTrack(track, stream))
+          }
+        }
+
+      } catch (err) {
+        console.error(err)
+        toast.error("Could not access media devices")
+      }
+    }
+
+    start()
+
     timerRef.current = setInterval(() => {
       setCallDuration(d => d + 1)
     }, 1000)
 
     return () => clearInterval(timerRef.current)
+
   }, [])
 
   useEffect(() => {
@@ -53,6 +79,12 @@ export default function CallInterface() {
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream
+      remoteVideoRef.current.muted = false
+      remoteVideoRef.current.volume = 1.0
+
+      remoteVideoRef.current.play()
+        .then(() => console.log("🔊 Audio playing"))
+        .catch(e => console.error("❌ Audio play error", e))
     }
   }, [remoteStream])
 
@@ -71,7 +103,7 @@ export default function CallInterface() {
     const callSock = getCallSocket()
     callSock?.emit('endCall', { targetUserId: activeCall?.receiverId })
     if (activeCall?.callId) {
-      await callAPI.endCall(activeCall.callId).catch(() => {})
+      await callAPI.endCall(activeCall.callId).catch(() => { })
     }
     endActiveCall()
     navigate('/calls')
@@ -88,7 +120,7 @@ export default function CallInterface() {
       {/* Remote video / audio placeholder */}
       {isVideo ? (
         <div className="flex-1 relative bg-surface-900 flex items-center justify-center">
-          <video ref={remoteVideoRef} autoPlay playsInline
+          <video ref={remoteVideoRef} autoPlay playsInline controls
             className="w-full h-full object-cover" />
           {!remoteStream && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -102,7 +134,7 @@ export default function CallInterface() {
 
           {/* Local video pip */}
           <div className="absolute bottom-4 right-4 w-32 h-24 rounded-xl overflow-hidden border-2 border-accent/30 shadow-xl">
-            <video ref={localVideoRef} autoPlay playsInline muted
+            <video ref={localVideoRef} autoPlay playsInline controls
               className="w-full h-full object-cover" />
             {isCameraOff && (
               <div className="absolute inset-0 bg-surface-900 flex items-center justify-center">
@@ -118,7 +150,8 @@ export default function CallInterface() {
           </div>
           <p className="text-white text-xl font-semibold mb-2">Voice Call</p>
           <p className="text-surface-200/50 text-sm">{remoteStream ? formatDuration(callDuration) : 'Connecting…'}</p>
-          <audio ref={remoteVideoRef} autoPlay playsInline className="hidden" />
+          {/* <audio ref={remoteVideoRef} autoPlay playsInline className="hidden" /> */}
+          <audio ref={remoteVideoRef} autoPlay controls className="hidden" />
         </div>
       )}
 

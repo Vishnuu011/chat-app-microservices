@@ -1,8 +1,8 @@
 import socketio
 from urllib.parse import parse_qs
 
+allow_origins = ["http://localhost:3000"]
 
-allow_origins=["http://localhost:3000"]
 sio = socketio.AsyncServer(
     async_mode="asgi",
     cors_allowed_origins=allow_origins
@@ -21,7 +21,6 @@ def get_receiver_socket_id(user_id: str):
 # -----------------------------
 @sio.event
 async def connect(sid, environ, auth):
-
     try:
         query_string = environ.get("QUERY_STRING", "")
         params = parse_qs(query_string)
@@ -29,15 +28,16 @@ async def connect(sid, environ, auth):
         user_id = params.get("userId", [None])[0]
 
         if not user_id:
-            print("Connection rejected: no userId")
+            print("❌ Connection rejected: no userId")
             return False
 
         user_socket_map[user_id] = sid
 
-        print(f"User connected {user_id} -> {sid}")
+        print(f"✅ User connected {user_id} -> {sid}")
+        print("Connected users:", user_socket_map)
 
     except Exception as e:
-        print("Connect error:", e)
+        print("❌ Connect error:", e)
         return False
 
 
@@ -46,46 +46,65 @@ async def connect(sid, environ, auth):
 # -----------------------------
 @sio.event
 async def disconnect(sid):
-
     try:
         for uid, socket_id in list(user_socket_map.items()):
             if socket_id == sid:
                 del user_socket_map[uid]
-                print(f"User disconnected {uid}")
+                print(f"❌ User disconnected {uid}")
                 break
-
     except Exception as e:
-        print("Disconnect error:", e)
+        print("❌ Disconnect error:", e)
 
 
 # -----------------------------
-# CALL USER
+# CALL USER (MAIN ENTRY)
 # -----------------------------
 @sio.event
 async def callUser(sid, data):
+    try:
+        print("📞 FULL CALL DATA:", data)
 
-    receiver_id = data.get("receiverId")
+        receiver_id = data.get("receiverId")
+        caller_id = data.get("callerId")
+        offer = data.get("offer")
+        call_type = data.get("callType")
 
-    caller_id = data.get("callerId")
-    offer = data.get("offer")
+        if not caller_id:
+            print("❌ callerId is None → FIX FRONTEND")
+            return
 
-    receiver_socket = get_receiver_socket_id(receiver_id)
+        receiver_socket = get_receiver_socket_id(receiver_id)
 
-    if receiver_socket:
+        if not receiver_socket:
+            print(f"❌ Receiver {receiver_id} not online")
+            return
 
+        # 🔥 STEP 1: Notify incoming call
+        await sio.emit(
+            "incomingCall",
+            {
+                "callerId": caller_id,
+                "callType": call_type
+            },
+            to=receiver_socket
+        )
+
+        # 🔥 STEP 2: Send WebRTC offer
         await sio.emit(
             "callOffer",
             {
                 "offer": offer,
-                "callerId": caller_id
+                "callerId": caller_id,
+                "receiverId": receiver_id,
+                "callType": call_type
             },
-            room=receiver_socket
+            to=receiver_socket
         )
 
-        print(f"{caller_id} calling {receiver_id}")
+        print(f"✅ {caller_id} calling {receiver_id}")
 
-    else:
-        print("Receiver not online")
+    except Exception as e:
+        print("❌ callUser error:", e)
 
 
 # -----------------------------
@@ -93,21 +112,22 @@ async def callUser(sid, data):
 # -----------------------------
 @sio.event
 async def answerCall(sid, data):
+    try:
+        caller_id = data.get("callerId")
+        answer = data.get("answer")
 
-    caller_id = data.get("callerId")
-    answer = data.get("answer")
+        caller_socket = get_receiver_socket_id(caller_id)
 
-    caller_socket = get_receiver_socket_id(caller_id)
+        if caller_socket:
+            await sio.emit(
+                "callAnswer",
+                {"answer": answer},
+                to=caller_socket
+            )
+            print(f"✅ Answer sent to {caller_id}")
 
-    if caller_socket:
-
-        await sio.emit(
-            "callAnswer",
-            {
-                "answer": answer
-            },
-            room=caller_socket
-        )
+    except Exception as e:
+        print("❌ answerCall error:", e)
 
 
 # -----------------------------
@@ -115,21 +135,21 @@ async def answerCall(sid, data):
 # -----------------------------
 @sio.event
 async def iceCandidate(sid, data):
+    try:
+        target_user = data.get("targetUserId")
+        candidate = data.get("candidate")
 
-    target_user = data.get("targetUserId")
-    candidate = data.get("candidate")
+        socket_id = get_receiver_socket_id(target_user)
 
-    socket_id = get_receiver_socket_id(target_user)
+        if socket_id:
+            await sio.emit(
+                "iceCandidate",
+                {"candidate": candidate},
+                to=socket_id
+            )
 
-    if socket_id:
-
-        await sio.emit(
-            "iceCandidate",
-            {
-                "candidate": candidate
-            },
-            room=socket_id
-        )
+    except Exception as e:
+        print("❌ iceCandidate error:", e)
 
 
 # -----------------------------
@@ -139,16 +159,11 @@ async def iceCandidate(sid, data):
 async def rejectCall(sid, data):
 
     caller_id = data.get("callerId")
-
+    
     socket_id = get_receiver_socket_id(caller_id)
 
     if socket_id:
-
-        await sio.emit(
-            "callRejected",
-            {},
-            room=socket_id
-        )
+        await sio.emit("callRejected", {}, to=socket_id)
 
 
 # -----------------------------
@@ -162,9 +177,4 @@ async def endCall(sid, data):
     socket_id = get_receiver_socket_id(target_user)
 
     if socket_id:
-
-        await sio.emit(
-            "callEnded",
-            {},
-            room=socket_id
-        )
+        await sio.emit("callEnded", {}, to=socket_id)

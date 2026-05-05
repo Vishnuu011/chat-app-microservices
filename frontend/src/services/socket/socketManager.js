@@ -7,6 +7,10 @@ const CHAT_URL = import.meta.env.VITE_CHAT_SOCKET_URL || 'http://localhost:8002'
 const CALL_URL = import.meta.env.VITE_CALL_SOCKET_URL || 'http://localhost:8003'
 
 export function connectChatSocket(userId) {
+  if (!userId) {
+    console.warn("Chat socket: userId missing")
+    return
+  }
   if (chatSocket?.connected) return chatSocket
   chatSocket = io(CHAT_URL, {
     query:           { userId },
@@ -17,6 +21,10 @@ export function connectChatSocket(userId) {
 }
 
 export function connectCallSocket(userId) {
+  if (!userId) {
+    console.warn("Chat socket: userId missing")
+    return
+  }
   if (callSocket?.connected) return callSocket
   callSocket = io(CALL_URL, {
     query:           { userId },

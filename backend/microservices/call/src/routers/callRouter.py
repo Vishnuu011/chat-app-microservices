@@ -19,13 +19,13 @@ call_router = APIRouter()
 
 @call_router.post(
     "/start-call",
-    response_model=CallResponse
+    status_code=status.HTTP_201_CREATED,
 )
 async def start_call_router(
     data: StartCallRequest,
     user: dict = Depends(isAuth),
     db: Any = Depends(get_db)
-) -> Optional[CallResponse]:
+) -> Dict[str, Any]:
 
     return await startCall(
         data=data,

@@ -4,8 +4,7 @@ import ChatList from '../Chat/ChatList.jsx'
 import { MessageSquare, Lock } from 'lucide-react'
 
 export default function ChatsPage() {
-  const isChatOpen = useMatch('chat/:chatId') || useMatch('/chat/:chatId')
-
+  const isChatOpen = useMatch('/chat/:chatId') 
   return (
     <div className="flex w-full h-full">
       {/* Chat list panel */}

@@ -18,7 +18,6 @@ async def startup():
     await startSendOtpConsumer()
 
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  
