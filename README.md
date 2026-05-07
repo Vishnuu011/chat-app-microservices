@@ -47,6 +47,9 @@ npm run dev  # Runs on :5173
 - MongoDB
 - Socket.IO (WebSocket)
 - Docker
+- RabbitMQ
+- redis python
+- SendGrid (Email API & SMTP)
 
 **Frontend:**
 - React 18
