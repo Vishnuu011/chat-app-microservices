@@ -6,9 +6,9 @@ motor
 pymongo
 aio-pika
 
-passlib
+
 python-jose
-argon2-cffi
+
 python-dotenv
 email-validator
 

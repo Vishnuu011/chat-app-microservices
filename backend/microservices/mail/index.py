@@ -3,6 +3,8 @@ from src.consumer import startSendOtpConsumer
 import time
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+import asyncio
+from src.config import settings
 
 
 app=fastapi.FastAPI(
@@ -11,16 +13,33 @@ app=fastapi.FastAPI(
     version="1.0.0"
 )
 
+consumer_task = None
 
 
 @app.on_event("startup")
 async def startup():
-    await startSendOtpConsumer()
+    global consumer_task
+    consumer_task = asyncio.create_task(startSendOtpConsumer())
+    print("RabbitMQ consumer started")
 
+
+@app.on_event("shutdown")
+async def shutdown():
+    global consumer_task
+
+    if consumer_task:
+        consumer_task.cancel()
+
+        try:
+            await consumer_task
+        except asyncio.CancelledError:
+            print("RabbitMQ consumer stopped")
+
+allow_origins = [settings.ALLOW_ORIGINS] if settings.ALLOW_ORIGINS else ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],   
     allow_headers=["*"],

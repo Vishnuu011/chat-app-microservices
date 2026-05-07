@@ -1,9 +1,11 @@
 import socketio
+from src.config.config import settings
 
+cors_allowed_origins = [settings.ALLOWED_ORIGINS] if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
 
 sio = socketio.AsyncServer(
     async_mode="asgi",
-    cors_allowed_origins="*",
+    cors_allowed_origins=cors_allowed_origins,
 )
 
 user_socket_map: dict[str, set[str]] = {}

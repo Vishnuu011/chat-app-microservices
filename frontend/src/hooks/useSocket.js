@@ -48,12 +48,14 @@ export function useSocket() {
     // ---------------- CALL ----------------
 
     // Incoming call notification
+    callSock?.off("incomingCall")
     callSock?.on('incomingCall', (data) => {
       console.log("📞 Incoming call:", data)
       setIncomingCall(data)
     })
 
     // -------- RECEIVER SIDE --------
+    callSock?.off("callOffer")
     callSock?.on('callOffer', async ({ offer, callerId, callType }) => {
       console.log("📥 Offer received from:", callerId)
 
@@ -74,32 +76,62 @@ export function useSocket() {
     })
 
     // -------- CALLER SIDE --------
+    callSock?.off("callAnswer")
     callSock?.on('callAnswer', async ({ answer }) => {
       console.log("✅ Answer received")
 
       const pc = useCallStore.getState().peerConnection
       if (!pc) return
 
-      await pc.setRemoteDescription(new RTCSessionDescription(answer))
-    })
-
-    // -------- ICE --------
-    callSock?.on('iceCandidate', async ({ candidate }) => {
-      const pc = useCallStore.getState().peerConnection
-      if (!pc) return
-
-      try {
-        await pc.addIceCandidate(new RTCIceCandidate(candidate))
-      } catch (err) {
-        console.error("ICE error:", err)
+      if (
+        pc.signalingState === "have-local-offer" &&
+        !pc.currentRemoteDescription
+      ) {
+        await pc.setRemoteDescription(new RTCSessionDescription(answer))
       }
     })
 
+    // -------- ICE --------
+    const pendingCandidates = []
+    callSock?.off("iceCandidate")
+    callSock?.on('iceCandidate', async ({ candidate }) => {
+
+      const pc = useCallStore.getState().peerConnection
+      if (!pc) return
+
+      if (pc.remoteDescription) {
+
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate))
+        } catch (err) {
+          console.error("ICE error:", err)
+        }
+
+      } else {
+        pendingCandidates.push(candidate)
+      }
+
+    })
+    callSock?.off('callRejected')
     callSock?.on('callRejected', () => endActiveCall())
+    callSock?.off('callEnded')
     callSock?.on('callEnded', () => endActiveCall())
 
     return () => {
       initialized.current = false
+
+      // chatSock?.off('getOnlineUsers')
+      // chatSock?.off('newMessage')
+      // chatSock?.off('userTyping')
+      // chatSock?.off('userStoppedTyping')
+      // chatSock?.off('messageSeen')
+
+      // callSock?.off('incomingCall')
+      // callSock?.off('callOffer')
+      // callSock?.off('callAnswer')
+      // callSock?.off('iceCandidate')
+      // callSock?.off('callRejected')
+      // callSock?.off('callEnded')
     }
   }, [user, privateKey])
 }

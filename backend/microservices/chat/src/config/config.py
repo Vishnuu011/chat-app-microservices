@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     CLOUD_NAME: str
     API_KEY: str
     API_SECRET: str
+    ALLOWED_ORIGINS: Optional[str] = None
 
     model_config = SettingsConfigDict(env_file=".env")
 

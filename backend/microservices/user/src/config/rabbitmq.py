@@ -56,7 +56,10 @@ async def publishToQueue(queueName: str, message: Any):
 
     # publish message
     await channel.default_exchange.publish(
-        aio_pika.Message(body=body),
+        aio_pika.Message(
+            body=body,
+            delivery_mode=aio_pika.DeliveryMode.PERSISTENT
+        ),
         routing_key=queue.name
     )
 

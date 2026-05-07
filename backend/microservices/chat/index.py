@@ -5,6 +5,7 @@ from src.config.db import connectDB, closeDB
 from src.routers import chatRouter
 import uvicorn
 import socketio
+from src.config.config import settings
 from src.socket.socket_app import sio
 
 
@@ -32,11 +33,11 @@ async def shutdown():
     await closeDB()  
  
 
-
+allowed_origins = [settings.ALLOWED_ORIGINS] if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],   
     allow_headers=["*"],

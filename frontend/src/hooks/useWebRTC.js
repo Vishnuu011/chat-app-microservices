@@ -49,6 +49,10 @@ export function useWebRTC() {
   // START MEDIA
   // -----------------------------
   const startMedia = useCallback(async (video = false) => {
+
+    const existing = useCallStore.getState().localStream
+    if (existing) return existing
+
     const stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: video
@@ -58,7 +62,9 @@ export function useWebRTC() {
     console.log("🎥 Video tracks:", stream.getVideoTracks())
 
     setLocalStream(stream)
+
     return stream
+
   }, [])
 
   // -----------------------------

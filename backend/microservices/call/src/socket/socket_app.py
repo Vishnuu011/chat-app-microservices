@@ -1,7 +1,8 @@
 import socketio
 from urllib.parse import parse_qs
+from src.config.config import settings
 
-allow_origins = ["http://localhost:3000"]
+allow_origins = [settings.ALLOWED_ORIGINS] if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
 
 sio = socketio.AsyncServer(
     async_mode="asgi",

@@ -46,6 +46,7 @@ export default function CallInterface() {
           })
 
           setLocalStream(stream)
+          
 
           const pc = useCallStore.getState().peerConnection
 
@@ -120,7 +121,7 @@ export default function CallInterface() {
       {/* Remote video / audio placeholder */}
       {isVideo ? (
         <div className="flex-1 relative bg-surface-900 flex items-center justify-center">
-          <video ref={remoteVideoRef} autoPlay playsInline controls
+          <video ref={remoteVideoRef} autoPlay playsInline 
             className="w-full h-full object-cover" />
           {!remoteStream && (
             <div className="absolute inset-0 flex flex-col items-center justify-center">
@@ -134,7 +135,7 @@ export default function CallInterface() {
 
           {/* Local video pip */}
           <div className="absolute bottom-4 right-4 w-32 h-24 rounded-xl overflow-hidden border-2 border-accent/30 shadow-xl">
-            <video ref={localVideoRef} autoPlay playsInline controls
+            <video ref={localVideoRef} autoPlay playsInline 
               className="w-full h-full object-cover" />
             {isCameraOff && (
               <div className="absolute inset-0 bg-surface-900 flex items-center justify-center">

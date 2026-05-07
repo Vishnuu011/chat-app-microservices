@@ -5,6 +5,7 @@ from src.routers import callRouter
 from src.config.db import connectDB, closeDB
 from src.routers import callRouter
 import uvicorn
+from src.config.config import settings
 import socketio
 from src.socket.socket_app import sio
 
@@ -34,7 +35,7 @@ async def shutdown():
     await closeDB()  
  
 
-allow_origins=["http://localhost:3000"]
+allow_origins=[settings.ALLOWED_ORIGINS] if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,

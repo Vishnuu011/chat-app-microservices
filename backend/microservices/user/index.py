@@ -4,6 +4,7 @@ from src.config.db import connectDB, closeDB
 from src.config.redis import connectRedis, close_redis
 from src.config.rabbitmq import connectRabbitmq, close_rabbitmq
 from src.routers import userRouter
+from src.config.config import settings
 import time
 import uvicorn
 
@@ -44,7 +45,8 @@ async def shutdown():
     await close_rabbitmq()    
 
 
-allow_origins=["http://localhost:3000"]
+allow_origins = [settings.ALLOW_ORIGINS] if settings.ALLOW_ORIGINS else ["http://localhost:3000"]
+
 
 
 app.add_middleware(
@@ -54,7 +56,6 @@ app.add_middleware(
     allow_methods=["*"],   
     allow_headers=["*"],
 )
-
 
 
 @app.middleware("http")
@@ -85,6 +86,8 @@ app.include_router(
 )
 async def healthCheck():
     return {"message":"user service is healthy"}
+
+
 
 
 

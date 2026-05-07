@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_HOURS: int
+    ALLOW_ORIGINS: Optional[str] = None
     
     class Config:
         env_file = ".env"

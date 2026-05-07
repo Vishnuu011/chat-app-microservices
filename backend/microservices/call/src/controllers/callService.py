@@ -23,29 +23,45 @@ async def startCall(
     data: StartCallRequest,
     user: dict = Depends(isAuth),
     db: Any = Depends(get_db)
-):
+) -> Dict[str, Any]:
 
 
     caller_id = str(user["_id"])
     receiver_id = data.receiverId
 
     if caller_id == receiver_id:
-        raise HTTPException(400, "You cannot call yourself")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot call yourself"
+        )
 
     try:
-        chat_object_id = ObjectId(data.chatId)
+        chat_object_id = ObjectId(
+            data.chatId
+        )
     except InvalidId:
-        raise HTTPException(400, "Invalid chatId")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid chatId"
+        )
 
     chats = db["chats"]
 
     chat = await chats.find_one({
         "_id": chat_object_id,
-        "users": {"$all": [caller_id, receiver_id]}
+        "users": {
+            "$all": [
+                caller_id, 
+                receiver_id
+            ]
+        }
     })
 
     if not chat:
-        raise HTTPException(404, "Chat not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Chat not found"
+        )
 
     calls = db["calls"]
 
@@ -69,7 +85,7 @@ async def startCall(
             "duration": existing_call.get("duration")
         }
 
-    # 🔥 Create new call
+
     now = datetime.utcnow()
 
     call_data = {
@@ -81,7 +97,9 @@ async def startCall(
         "createdAt": now
     }
 
-    result = await calls.insert_one(call_data)
+    result = await calls.insert_one(
+        call_data
+    )
 
     return {
         "message": "Call started",
@@ -101,7 +119,7 @@ async def endCall(
     callId: str,
     user: dict = Depends(isAuth),
     db: Any = Depends(get_db)
-):
+) -> EndCallResponse:
 
     
 
@@ -127,7 +145,10 @@ async def endCall(
     user_id = str(user["_id"])
 
     # 🔹 Check permission
-    if user_id not in [call["callerId"], call["receiverId"]]:
+    if user_id not in [
+        call["callerId"], 
+        call["receiverId"]
+    ]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not allowed to end this call"
@@ -143,7 +164,9 @@ async def endCall(
 
     now = datetime.utcnow()
 
-    duration = (now - call["createdAt"]).total_seconds()
+    duration = (
+        now - call["createdAt"]
+    ).total_seconds()
 
     # 🔹 Update DB
     await calls.update_one(
@@ -158,21 +181,33 @@ async def endCall(
     )
 
     # 🔹 Get sockets
-    receiver_socket = get_receiver_socket_id(call["receiverId"])
-    caller_socket = get_receiver_socket_id(call["callerId"])
+    receiver_socket = get_receiver_socket_id(
+        call["receiverId"]
+    )
+    caller_socket = get_receiver_socket_id(
+        call["callerId"]
+    )
 
     payload = {
         "callId": callId,
         "duration": duration
     }
 
-    # 🔥 Notify both users (safe emit)
+    
     try:
         if receiver_socket:
-            await sio.emit("callEnded", payload, to=receiver_socket)
+            await sio.emit(
+                "callEnded", 
+                payload, 
+                to=receiver_socket
+            )
 
         if caller_socket:
-            await sio.emit("callEnded", payload, to=caller_socket)
+            await sio.emit(
+                "callEnded", 
+                payload, 
+                to=caller_socket
+            )
 
     except Exception as e:
         print("Emit error:", e)
@@ -213,14 +248,30 @@ async def getAllCalls(
 
         calls.append(
             CallHistoryItem(
-                callId=str(call["_id"]),
-                callerId=call["callerId"],
-                receiverId=call["receiverId"],
-                chatId=call["chatId"],
-                callType=call["callType"],
-                status=call["status"],
-                createdAt=call["createdAt"],
-                duration=call.get("duration")
+                callId=str(
+                    call["_id"]
+                ),
+                callerId=call[
+                    "callerId"
+                ],
+                receiverId=call[
+                    "receiverId"
+                ],
+                chatId=call[
+                    "chatId"
+                ],
+                callType=call[
+                    "callType"
+                ],
+                status=call[
+                    "status"
+                ],
+                createdAt=call[
+                    "createdAt"
+                ],
+                duration=call.get(
+                    "duration"
+                )
             )
         )
 
