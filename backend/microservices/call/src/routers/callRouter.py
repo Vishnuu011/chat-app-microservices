@@ -9,8 +9,7 @@ from src.schema.callSchema import (
 )
 from fastapi import Depends, HTTPException, status, APIRouter
 from src.controllers.callService import getAllCalls, startCall, endCall
-from bson import ObjectId
-from bson.errors import InvalidId
+
 from typing import Any, Dict, Optional
 
 
