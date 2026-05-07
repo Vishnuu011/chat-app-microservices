@@ -26,6 +26,9 @@ python index.py
 - **Database:** MongoDB
 - **Real-time:** Socket.IO (WebSocket)
 - **Containerization:** Docker
+- **aio-pika:**  RabbitMQ
+- **Redis:** redis python
+- **Twilio SendGrid:** SendGrid (Email API & SMTP)
 
 
 
