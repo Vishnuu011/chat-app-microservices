@@ -1,7 +1,7 @@
 import socketio
 from src.config.config import settings
 
-cors_allowed_origins = [settings.ALLOWED_ORIGINS] if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
+cors_allowed_origins = ["https://test-frontent-eight.vercel.app"]
 
 sio = socketio.AsyncServer(
     async_mode="asgi",

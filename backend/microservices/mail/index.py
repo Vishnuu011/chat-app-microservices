@@ -35,7 +35,9 @@ async def shutdown():
         except asyncio.CancelledError:
             print("RabbitMQ consumer stopped")
 
-allow_origins = [settings.ALLOW_ORIGINS] if settings.ALLOW_ORIGINS else ["http://localhost:3000"]
+allow_origins = [
+    "https://test-frontent-eight.vercel.app"
+]
 
 app.add_middleware(
     CORSMiddleware,

@@ -33,11 +33,13 @@ async def shutdown():
     await closeDB()  
  
 
-allowed_origins = [settings.ALLOWED_ORIGINS] if settings.ALLOWED_ORIGINS else ["http://localhost:3000"]
+allow_origins = [
+    "https://test-frontent-eight.vercel.app"
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=allow_origins,
     allow_credentials=True,
     allow_methods=["*"],   
     allow_headers=["*"],

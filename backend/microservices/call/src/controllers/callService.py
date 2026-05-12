@@ -25,7 +25,6 @@ async def startCall(
     db: Any = Depends(get_db)
 ) -> Dict[str, Any]:
 
-
     caller_id = str(user["_id"])
     receiver_id = data.receiverId
 
@@ -36,9 +35,7 @@ async def startCall(
         )
 
     try:
-        chat_object_id = ObjectId(
-            data.chatId
-        )
+        chat_object_id = ObjectId(data.chatId)
     except InvalidId:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -46,15 +43,9 @@ async def startCall(
         )
 
     chats = db["chats"]
-
     chat = await chats.find_one({
         "_id": chat_object_id,
-        "users": {
-            "$all": [
-                caller_id, 
-                receiver_id
-            ]
-        }
+        "users": {"$all": [caller_id, receiver_id]}
     })
 
     if not chat:
@@ -65,7 +56,7 @@ async def startCall(
 
     calls = db["calls"]
 
-    # 🔥 Check existing call
+    # Return existing ringing call if present
     existing_call = await calls.find_one({
         "callerId": caller_id,
         "receiverId": receiver_id,
@@ -85,9 +76,7 @@ async def startCall(
             "duration": existing_call.get("duration")
         }
 
-
     now = datetime.utcnow()
-
     call_data = {
         "callerId": caller_id,
         "receiverId": receiver_id,
@@ -97,13 +86,12 @@ async def startCall(
         "createdAt": now
     }
 
-    result = await calls.insert_one(
-        call_data
-    )
+    result = await calls.insert_one(call_data)
+    call_id = str(result.inserted_id)
 
     return {
         "message": "Call started",
-        "callId": str(result.inserted_id),
+        "callId": call_id,
         "callerId": caller_id,
         "receiverId": receiver_id,
         "chatId": data.chatId,
@@ -114,16 +102,12 @@ async def startCall(
     }
 
 
-
 async def endCall(
     callId: str,
     user: dict = Depends(isAuth),
     db: Any = Depends(get_db)
 ) -> EndCallResponse:
 
-    
-
-    # 🔹 Validate callId
     try:
         call_object_id = ObjectId(callId)
     except InvalidId:
@@ -133,7 +117,6 @@ async def endCall(
         )
 
     calls = db["calls"]
-
     call = await calls.find_one({"_id": call_object_id})
 
     if not call:
@@ -144,17 +127,12 @@ async def endCall(
 
     user_id = str(user["_id"])
 
-    # 🔹 Check permission
-    if user_id not in [
-        call["callerId"], 
-        call["receiverId"]
-    ]:
+    if user_id not in [call["callerId"], call["receiverId"]]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not allowed to end this call"
         )
 
-    # 🔥 Prevent ending twice
     if call.get("status") == "ended":
         return EndCallResponse(
             message="Call already ended",
@@ -164,51 +142,33 @@ async def endCall(
 
     now = datetime.utcnow()
 
-    duration = (
-        now - call["createdAt"]
-    ).total_seconds()
+    # ✅ Mark missed if receiver never answered
+    was_ringing = call.get("status") == "ringing"
+    final_status = "missed" if was_ringing else "ended"
+    duration = 0 if was_ringing else (now - call["createdAt"]).total_seconds()
 
-    # 🔹 Update DB
     await calls.update_one(
         {"_id": call_object_id},
         {
             "$set": {
-                "status": "ended",
+                "status": final_status,
                 "endedAt": now,
                 "duration": duration
             }
         }
     )
 
-    # 🔹 Get sockets
-    receiver_socket = get_receiver_socket_id(
-        call["receiverId"]
-    )
-    caller_socket = get_receiver_socket_id(
-        call["callerId"]
-    )
+    payload = {"callId": callId, "duration": duration}
 
-    payload = {
-        "callId": callId,
-        "duration": duration
-    }
+    # ✅ Consistent payload emitted to both parties
+    receiver_socket = get_receiver_socket_id(call["receiverId"])
+    caller_socket = get_receiver_socket_id(call["callerId"])
 
-    
     try:
         if receiver_socket:
-            await sio.emit(
-                "callEnded", 
-                payload, 
-                to=receiver_socket
-            )
-
+            await sio.emit("callEnded", payload, to=receiver_socket)
         if caller_socket:
-            await sio.emit(
-                "callEnded", 
-                payload, 
-                to=caller_socket
-            )
-
+            await sio.emit("callEnded", payload, to=caller_socket)
     except Exception as e:
         print("Emit error:", e)
 
@@ -219,62 +179,33 @@ async def endCall(
     )
 
 
-
 async def getAllCalls(
     user: dict = Depends(isAuth),
     db: Any = Depends(get_db)
 ) -> Optional[CallHistoryResponse]:
 
     user_id = str(user["_id"])
-
     calls_collection = db["calls"]
 
-    cursor = calls_collection.find(
-        {
-            "$or": [
-                {
-                    "callerId": user_id
-                },
-                {
-                    "receiverId": user_id
-                }
-            ]
-        }
-    ).sort("createdAt", -1)
+    cursor = calls_collection.find({
+        "$or": [
+            {"callerId": user_id},
+            {"receiverId": user_id}
+        ]
+    }).sort("createdAt", -1)
 
     calls: list[CallHistoryItem] = []
 
     async for call in cursor:
+        calls.append(CallHistoryItem(
+            callId=str(call["_id"]),
+            callerId=call["callerId"],
+            receiverId=call["receiverId"],
+            chatId=call["chatId"],
+            callType=call["callType"],
+            status=call["status"],
+            createdAt=call["createdAt"],
+            duration=call.get("duration")
+        ))
 
-        calls.append(
-            CallHistoryItem(
-                callId=str(
-                    call["_id"]
-                ),
-                callerId=call[
-                    "callerId"
-                ],
-                receiverId=call[
-                    "receiverId"
-                ],
-                chatId=call[
-                    "chatId"
-                ],
-                callType=call[
-                    "callType"
-                ],
-                status=call[
-                    "status"
-                ],
-                createdAt=call[
-                    "createdAt"
-                ],
-                duration=call.get(
-                    "duration"
-                )
-            )
-        )
-
-    return CallHistoryResponse(
-        calls=calls
-    )
+    return CallHistoryResponse(calls=calls)
