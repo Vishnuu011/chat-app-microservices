@@ -25,7 +25,7 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 </td>
 
 <td align="center">
-<img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/mongodb-icon.png" width="60"/><br>MongoDB
+<img src="https://motor.readthedocs.io/en/stable/_images/motor.png" width="60"/><br>Motor
 </td>
 </tr>
 
