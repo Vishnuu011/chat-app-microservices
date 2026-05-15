@@ -66,8 +66,39 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 ### Frontend
 
-<p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="70"/> <img src="https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg" width="70"/> </p> <p align="center"> <b>React</b> &nbsp;&nbsp;&nbsp; <b>Vite</b> &nbsp;&nbsp;&nbsp; <b>TypeScript</b> &nbsp;&nbsp;&nbsp; <b>Tailwind CSS</b> </p>
-<p align="center"> <img src="https://raw.githubusercontent.com/pmndrs/zustand/main/docs/logo.png" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="70"/> </p> <p align="center"> <b>Zustand</b> &nbsp;&nbsp;&nbsp; <b>Socket.IO Client</b> &nbsp;&nbsp;&nbsp; <b>Axios</b> </p>
+<table align="center">
+<tr>
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="70"/><br>React
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="70"/><br>Vite
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="70"/><br>TypeScript
+</td>
+
+<td align="center">
+<img src="https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg" width="70"/><br>Tailwind CSS
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<img src="https://raw.githubusercontent.com/pmndrs/zustand/main/docs/logo.png" width="70"/><br>Zustand
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/><br>Socket.IO Client
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="70"/><br>Axios
+</td>
+</tr>
+</table>
 
 
 ---
