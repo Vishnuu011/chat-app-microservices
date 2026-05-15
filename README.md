@@ -6,11 +6,62 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 ## 🛠️ Technology Stack
 
+## 🛠️ Technology Stack
+
 ### Backend
 
-<p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="70"/> </p> <p align="center"> <b>FastAPI</b> &nbsp;&nbsp;&nbsp; <b>Socket.IO</b> &nbsp;&nbsp;&nbsp; <b>MongoDB</b> &nbsp;&nbsp;&nbsp; <b>Motor (Async Mongo Driver)</b> </p>
-<p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rabbitmq/rabbitmq-original.svg" width="70"/> <img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="70"/> <img src="https://avatars.githubusercontent.com/u/88696189?s=200&v=4" width="70"/> </p> <p align="center"> <b>Redis</b> &nbsp;&nbsp;&nbsp; <b>RabbitMQ</b> &nbsp;&nbsp;&nbsp; <b>SendGrid</b> &nbsp;&nbsp;&nbsp; <b>VideoSDK</b> </p>
-<p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/uvicorn/uvicorn-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="70"/> </p> <p align="center"> <b>Uvicorn</b> &nbsp;&nbsp;&nbsp; <b>Python</b> &nbsp;&nbsp;&nbsp; <b>Docker</b> </p>
+<table align="center">
+<tr>
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="60"/><br>FastAPI
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="60"/><br>Socket.IO
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="60"/><br>MongoDB
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="60"/><br>Motor
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="60"/><br>Redis
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rabbitmq/rabbitmq-original.svg" width="60"/><br>RabbitMQ
+</td>
+
+<td align="center">
+<img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="60"/><br>SendGrid
+</td>
+
+<td align="center">
+<img src="https://avatars.githubusercontent.com/u/88696189?s=200&v=4" width="60"/><br>VideoSDK
+</td>
+</tr>
+
+<tr>
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="60"/><br>Uvicorn
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="60"/><br>Python
+</td>
+
+<td align="center">
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="60"/><br>Docker
+</td>
+</tr>
+
+</table>
 
 
 ### Frontend
