@@ -1,7 +1,7 @@
 import socketio
 from src.config.config import settings
 
-cors_allowed_origins = ["https://test-frontent-eight.vercel.app"]
+cors_allowed_origins = ["https://chat-app-frontend-deploy-ten.vercel.app"]
 
 sio = socketio.AsyncServer(
     async_mode="asgi",

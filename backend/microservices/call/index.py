@@ -36,7 +36,7 @@ async def shutdown():
  
 
 allow_origins = [
-    "https://test-frontent-eight.vercel.app"
+    "https://chat-app-frontend-deploy-ten.vercel.app"
 ]
 
 app.add_middleware(

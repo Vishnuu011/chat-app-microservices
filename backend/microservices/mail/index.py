@@ -33,10 +33,12 @@ async def shutdown():
         try:
             await consumer_task
         except asyncio.CancelledError:
+    
+  
             print("RabbitMQ consumer stopped")
 
 allow_origins = [
-    "https://test-frontent-eight.vercel.app"
+    "https://chat-app-frontend-deploy-ten.vercel.app"
 ]
 
 app.add_middleware(

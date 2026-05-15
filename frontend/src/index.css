@@ -1,50 +1,42 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
 
-@layer base {
-  * { box-sizing: border-box; }
-  :root {
-    --accent: #6c8cff;
-    --accent-dark: #4a6bff;
-    --surface-950: #080a12;
-    --surface-900: #10131c;
-    --surface-800: #1a1f2e;
-    scrollbar-width: thin;
-    scrollbar-color: #2a3050 transparent;
-  }
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-thumb { background: #2a3050; border-radius: 4px; }
-  ::selection { background: #6c8cff44; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-primary: #111b21;
+  --bg-secondary: #1c2b33;
+  --bg-panel: #202c33;
+  --bg-hover: #2a3942;
+  --bg-input: #2a3942;
+  --bg-message-out: #005c4b;
+  --bg-message-in: #202c33;
+  --bg-header: #202c33;
+  --accent: #00a884;
+  --accent-hover: #06cf9c;
+  --accent-light: rgba(0,168,132,0.15);
+  --text-primary: #e9edef;
+  --text-secondary: #8696a0;
+  --text-muted: #667781;
+  --border: #2a3942;
+  --danger: #ef4444;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+  --radius: 8px;
+  --font: 'Plus Jakarta Sans', sans-serif;
 }
 
-@layer components {
-  .glass {
-    background: rgba(26, 31, 46, 0.7);
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(108, 140, 255, 0.08);
-  }
-  .glass-light {
-    background: rgba(26, 31, 46, 0.4);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.04);
-  }
-  .btn-primary {
-    @apply bg-accent hover:bg-accent-dark text-white font-semibold px-6 py-3 rounded-xl
-           transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed
-           active:scale-95;
-  }
-  .btn-ghost {
-    @apply text-surface-200 hover:text-white hover:bg-surface-800 px-4 py-2 rounded-xl
-           transition-all duration-150 active:scale-95;
-  }
-  .input-field {
-    @apply w-full bg-surface-800 border border-surface-800 focus:border-accent/50
-           text-white placeholder-surface-200/40 rounded-xl px-4 py-3
-           outline-none transition-all duration-200 font-sans text-sm;
-  }
-  .lock-badge {
-    @apply inline-flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-full
-           bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
-  }
-}
+html, body, #root { height: 100%; overflow: hidden; }
+body { font-family: var(--font); background: var(--bg-primary); color: var(--text-primary); font-size: 14px; -webkit-font-smoothing: antialiased; }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes slideIn { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes waveTyping { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+@keyframes pulse { 0%,100% { transform: scale(1); opacity:1; } 50% { transform: scale(1.1); opacity:0.7; } }
+@keyframes ringPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,168,132,0.4); } 50% { box-shadow: 0 0 0 15px rgba(0,168,132,0); } }
+
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, textarea { font-family: inherit; }
+a { text-decoration: none; color: inherit; }

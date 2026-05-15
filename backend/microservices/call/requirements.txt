@@ -4,6 +4,7 @@ motor
 pymongo
 python-jose
 httpx
+requests
 python-multipart
-email-validator
 python-socketio
+email-validator

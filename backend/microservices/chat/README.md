@@ -5,7 +5,7 @@ Real-time messaging service with WebSocket support.
 ## Features
 
 - Create & manage chat conversations
-- Send encrypted messages
+- Send messages
 - Real-time WebSocket messaging
 - Message history
 - Typing indicators
@@ -28,17 +28,17 @@ Runs on **8002**
 
 ## API Endpoints
 
-- `GET /api/chats` - Get all conversations
-- `POST /api/chats` - Create new chat
-- `GET /api/chats/{id}/messages` - Get chat messages
-- `POST /api/chats/{id}/messages` - Send message
+- `GET /api/v1/chat/all` - Get all conversations
+- `POST /api/v1/chat/new` - Create new chat
+- `GET /api/v1/messages/{chatId}` - Get chat messages
+- `POST /api/v1/message` - Send message
 
 ## WebSocket Events
 
 ### Emit
 - `joinChat` - Join a chat room
 - `leaveChat` - Leave a chat room
-- `sendMessage` - Send message (encrypted)
+- `sendMessage` - Send message 
 - `typing` - User typing
 - `stopTyping` - Stop typing
 

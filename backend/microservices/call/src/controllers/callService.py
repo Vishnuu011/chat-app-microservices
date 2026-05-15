@@ -16,6 +16,10 @@ from src.schema.callSchema import (
     CallHistoryResponse
 )
 from src.socket.socket_app import sio, get_receiver_socket_id
+from src.utils.videosdk import (
+    create_videosdk_token,
+    create_meeting
+)
 
 
 
@@ -30,76 +34,68 @@ async def startCall(
 
     if caller_id == receiver_id:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=400,
             detail="Cannot call yourself"
-        )
-
-    try:
-        chat_object_id = ObjectId(data.chatId)
-    except InvalidId:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid chatId"
-        )
-
-    chats = db["chats"]
-    chat = await chats.find_one({
-        "_id": chat_object_id,
-        "users": {"$all": [caller_id, receiver_id]}
-    })
-
-    if not chat:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Chat not found"
         )
 
     calls = db["calls"]
 
-    # Return existing ringing call if present
-    existing_call = await calls.find_one({
-        "callerId": caller_id,
-        "receiverId": receiver_id,
-        "status": "ringing"
-    })
+    token = create_videosdk_token()
 
-    if existing_call:
-        return {
-            "message": "Call already in progress",
-            "callId": str(existing_call["_id"]),
-            "callerId": existing_call["callerId"],
-            "receiverId": existing_call["receiverId"],
-            "chatId": existing_call["chatId"],
-            "callType": existing_call["callType"],
-            "status": existing_call["status"],
-            "createdAt": existing_call["createdAt"],
-            "duration": existing_call.get("duration")
-        }
+    meeting_id = await create_meeting(
+        token=token
+    )
 
     now = datetime.utcnow()
+
     call_data = {
         "callerId": caller_id,
         "receiverId": receiver_id,
         "chatId": data.chatId,
         "callType": data.callType,
+        "meetingId": meeting_id,
+        "token": token,
         "status": "ringing",
         "createdAt": now
     }
 
-    result = await calls.insert_one(call_data)
+    result = await calls.insert_one(
+        call_data
+    )
+
     call_id = str(result.inserted_id)
+
+    receiver_socket = get_receiver_socket_id(
+        receiver_id
+    )
+
+    if receiver_socket:
+        await sio.emit(
+            "incomingCall",
+            {
+                "callId": call_id,
+                "meetingId": meeting_id,
+                "token": token,
+                "callerId": caller_id,
+                "receiverId": receiver_id,
+                "callType": data.callType
+            },
+            to=receiver_socket
+        )
 
     return {
         "message": "Call started",
         "callId": call_id,
+        "meetingId": meeting_id,
+        "token": token,
         "callerId": caller_id,
         "receiverId": receiver_id,
-        "chatId": data.chatId,
         "callType": data.callType,
         "status": "ringing",
-        "createdAt": now,
-        "duration": None
+        "createdAt": now
     }
+
+
 
 
 async def endCall(
@@ -117,7 +113,9 @@ async def endCall(
         )
 
     calls = db["calls"]
-    call = await calls.find_one({"_id": call_object_id})
+    call = await calls.find_one(
+        {"_id": call_object_id}
+    )
 
     if not call:
         raise HTTPException(
@@ -127,7 +125,10 @@ async def endCall(
 
     user_id = str(user["_id"])
 
-    if user_id not in [call["callerId"], call["receiverId"]]:
+    if user_id not in [
+        call["callerId"], 
+        call["receiverId"]
+    ]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not allowed to end this call"
@@ -142,10 +143,12 @@ async def endCall(
 
     now = datetime.utcnow()
 
-    # ✅ Mark missed if receiver never answered
+
     was_ringing = call.get("status") == "ringing"
     final_status = "missed" if was_ringing else "ended"
-    duration = 0 if was_ringing else (now - call["createdAt"]).total_seconds()
+    duration = 0 if was_ringing else (
+        now - call["createdAt"]
+    ).total_seconds()
 
     await calls.update_one(
         {"_id": call_object_id},
@@ -158,17 +161,32 @@ async def endCall(
         }
     )
 
-    payload = {"callId": callId, "duration": duration}
+    payload = {
+        "callId": callId, 
+        "duration": duration
+    }
 
     # ✅ Consistent payload emitted to both parties
-    receiver_socket = get_receiver_socket_id(call["receiverId"])
-    caller_socket = get_receiver_socket_id(call["callerId"])
+    receiver_socket = get_receiver_socket_id(
+        call["receiverId"]
+    )
+    caller_socket = get_receiver_socket_id(
+        call["callerId"]
+    )
 
     try:
         if receiver_socket:
-            await sio.emit("callEnded", payload, to=receiver_socket)
+            await sio.emit(
+                "callEnded", 
+                payload, 
+                to=receiver_socket
+            )
         if caller_socket:
-            await sio.emit("callEnded", payload, to=caller_socket)
+            await sio.emit(
+                "callEnded", 
+                payload, 
+                to=caller_socket
+            )
     except Exception as e:
         print("Emit error:", e)
 

@@ -23,6 +23,7 @@ python index.py
 ## Tech Stack
 
 - **Framework:** FastAPI
+- **VideoSDK.Live** Videosdk (for video call and voice call API Provider)
 - **Database:** MongoDB
 - **Real-time:** Socket.IO (WebSocket)
 - **Containerization:** Docker

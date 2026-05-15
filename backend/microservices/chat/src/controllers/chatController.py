@@ -55,7 +55,10 @@ async def createNewChat(
         existing_chat = await chats.find_one(
             {
                 "users": {
-                    "$all": [user_id, other_user_id],
+                    "$all": [
+                        user_id, 
+                        other_user_id
+                    ],
                     "$size": 2
                 }
             }
@@ -75,7 +78,9 @@ async def createNewChat(
             updatedAt=now
         )
 
-        result = await chats.insert_one(new_chat.model_dump())
+        result = await chats.insert_one(
+            new_chat.model_dump()
+        )
 
         return ChatRespondsSchema(
             responds="New chat created",
@@ -109,7 +114,9 @@ async def getAllChats(
             {"users": user_id}
         ).sort("updatedAt", -1)
 
-        chats = await chats_cursor.to_list(length=None)
+        chats = await chats_cursor.to_list(
+            length=None
+        )
 
         chat_items = []
 

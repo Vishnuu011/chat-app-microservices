@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     MONGO_URI: str
     SECRET_KEY: str
     ALGORITHM: str
+    VIDEOSDK_API_KEY: str
+    VIDEOSDK_SECRET_KEY: str
     # USER_SERVICE: str
 
     # API_KEY: str
