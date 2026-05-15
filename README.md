@@ -87,7 +87,7 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 <tr>
 <td align="center">
-<img src="https://raw.githubusercontent.com/pmndrs/zustand/main/docs/logo.png" width="70"/><br>Zustand
+<img src="![alt text](images/image.png)" width="70"/><br>Zustand
 </td>
 
 <td align="center">
