@@ -6,8 +6,6 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 ## 🛠️ Technology Stack
 
-## 🛠️ Technology Stack
-
 ### Backend
 
 <table align="center">
