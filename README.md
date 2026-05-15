@@ -87,7 +87,7 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 <tr>
 <td align="center">
-<img src="![alt text](image.png)" width="70"/><br>Zustand
+<img src="https://user-images.githubusercontent.com/958486/218346783-72be5ae3-b953-4dd7-b239-788a882fdad6.svg" width="70"/><br>Zustand
 </td>
 
 <td align="center">
