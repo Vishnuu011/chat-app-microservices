@@ -7,17 +7,17 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 ## 🛠️ Technology Stack
 
 ### Backend
-```
+
 <p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="70"/> </p> <p align="center"> <b>FastAPI</b> &nbsp;&nbsp;&nbsp; <b>Socket.IO</b> &nbsp;&nbsp;&nbsp; <b>MongoDB</b> &nbsp;&nbsp;&nbsp; <b>Motor (Async Mongo Driver)</b> </p>
 <p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rabbitmq/rabbitmq-original.svg" width="70"/> <img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="70"/> <img src="https://avatars.githubusercontent.com/u/88696189?s=200&v=4" width="70"/> </p> <p align="center"> <b>Redis</b> &nbsp;&nbsp;&nbsp; <b>RabbitMQ</b> &nbsp;&nbsp;&nbsp; <b>SendGrid</b> &nbsp;&nbsp;&nbsp; <b>VideoSDK</b> </p>
 <p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/uvicorn/uvicorn-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="70"/> </p> <p align="center"> <b>Uvicorn</b> &nbsp;&nbsp;&nbsp; <b>Python</b> &nbsp;&nbsp;&nbsp; <b>Docker</b> </p>
-```
+
 
 ### Frontend
-```
+
 <p align="center"> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="70"/> <img src="https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg" width="70"/> </p> <p align="center"> <b>React</b> &nbsp;&nbsp;&nbsp; <b>Vite</b> &nbsp;&nbsp;&nbsp; <b>TypeScript</b> &nbsp;&nbsp;&nbsp; <b>Tailwind CSS</b> </p>
 <p align="center"> <img src="https://raw.githubusercontent.com/pmndrs/zustand/main/docs/logo.png" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/> <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="70"/> </p> <p align="center"> <b>Zustand</b> &nbsp;&nbsp;&nbsp; <b>Socket.IO Client</b> &nbsp;&nbsp;&nbsp; <b>Axios</b> </p>
-```
+
 
 ---
 
