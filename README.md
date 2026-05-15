@@ -49,7 +49,7 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 <tr>
 <td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="60"/><br>Uvicorn
+<img src="https://uvicorn.dev/uvicorn.png" width="60"/><br>Uvicorn
 </td>
 
 <td align="center">
