@@ -79,7 +79,7 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 </td>
 
 <td align="center">
-<img src="https://www.vectorlogo.zone/logos/tailwindcss/tailwindcss-icon.svg" width="70"/><br>Tailwind CSS
+<img src="https://cdn-icons-png.flaticon.com/512/919/919826.png" width="70"/><br>CSS
 </td>
 </tr>
 
