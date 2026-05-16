@@ -47,39 +47,29 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 ### Frontend
 
-<table align="center">
-<tr>
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="70"/><br>React
-</td>
+<p align="center">
 
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="70"/><br>Vite
-</td>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="70"/>
+  &nbsp;&nbsp;&nbsp;
 
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="70"/><br>TypeScript
-</td>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg" width="70"/>
+  &nbsp;&nbsp;&nbsp;
 
-<td align="center">
-<img src="https://cdn-icons-png.flaticon.com/512/919/919826.png" width="70"/><br>CSS
-</td>
-</tr>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="70"/>
+  &nbsp;&nbsp;&nbsp;
 
-<tr>
-<td align="center">
-<img src="https://user-images.githubusercontent.com/958486/218346783-72be5ae3-b953-4dd7-b239-788a882fdad6.svg" width="70"/><br>Zustand
-</td>
+  <img src="https://cdn-icons-png.flaticon.com/512/919/919826.png" width="70"/>
+  &nbsp;&nbsp;&nbsp;
 
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/><br>Socket.IO Client
-</td>
+  <img src="https://user-images.githubusercontent.com/958486/218346783-72be5ae3-b953-4dd7-b239-788a882fdad6.svg" width="70"/>
+  &nbsp;&nbsp;&nbsp;
 
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="70"/><br>Axios
-</td>
-</tr>
-</table>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="70"/>
+  &nbsp;&nbsp;&nbsp;
+
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/axios/axios-plain.svg" width="70"/>
+
+</p>
 
 
 ---
