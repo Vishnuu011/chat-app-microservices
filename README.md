@@ -8,58 +8,16 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 ### Backend
 
-<table align="center">
-<tr>
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="60"/><br>FastAPI
-</td>
+<p align="center">
 
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="60"/><br>Socket.IO
-</td>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg" width="60"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/socketio/socketio-original.svg" width="60"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="60"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="60"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rabbitmq/rabbitmq-original.svg" width="60"/>
+<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="60"/>
 
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="60"/><br>MongoDB
-</td>
-
-<td align="center">
-<img src="https://motor.readthedocs.io/en/stable/_images/motor.png" width="60"/><br>Motor
-</td>
-</tr>
-
-<tr>
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" width="60"/><br>Redis
-</td>
-
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rabbitmq/rabbitmq-original.svg" width="60"/><br>RabbitMQ
-</td>
-
-<td align="center">
-<img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="60"/><br>SendGrid
-</td>
-
-<td align="center">
-<img src="https://camo.githubusercontent.com/aea88ea1298578df183d68b79dab6a8aa3f32bfa5ff358939672ea364517cdb3/68747470733a2f2f7374617469632e766964656f73646b2e6c6976652f766964656f73646b5f6c6f676f5f776562736974655f626c61636b2e706e67" width="60"/><br>VideoSDK
-</td>
-</tr>
-
-<tr>
-<td align="center">
-<img src="https://uvicorn.dev/uvicorn.png" width="60"/><br>Uvicorn
-</td>
-
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="60"/><br>Python
-</td>
-
-<td align="center">
-<img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="60"/><br>Docker
-</td>
-</tr>
-
-</table>
+</p>
 
 
 ### Frontend
