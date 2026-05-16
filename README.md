@@ -146,66 +146,9 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
 
 ### System Architecture Diagram
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│                         CLIENT LAYER (Frontend)                    │
-│  React + Vite + TypeScript + Tailwind CSS + Socket.IO Client       │
-│                      Port: 5173 (Dev) / 3000 (Prod)                │
-└────────────────────────────┬─────────────────────────────────────┘
-                             │
-            ┌────────────────┼────────────────┐
-            │                │                │
-            ▼                ▼                ▼
-      ┌──────────┐    ┌──────────┐    ┌──────────┐
-      │ HTTP/REST│    │ WebSocket│    │ WebSocket│
-      │ Requests │    │  Events  │    │  Events  │
-      └──────────┘    └──────────┘    └──────────┘
-            │                │                │
-            └────────────────┼────────────────┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-        ▼                    ▼                    ▼
-   ┌──────────┐         ┌──────────┐        ┌──────────┐
-   │   User   │         │   Chat   │        │   Call   │
-   │ Service  │         │ Service  │        │ Service  │
-   │ Port:8000         │ Port:8002 │        │ Port:8003 │
-   └──────────┘         └──────────┘        └──────────┘
-        │                    │                    │
-        └────────────────────┼────────────────────┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-        ▼                    ▼                    ▼
-   ┌──────────┐         ┌──────────┐        ┌──────────┐
-   │ MongoDB  │         │ RabbitMQ │        │  Redis   │
-   │ Database │         │   Queue  │        │  Cache   │
-   └──────────┘         └──────────┘        └──────────┘
-        │                    │                    │
-        ▼                    ▼                    ▼
-   Data Storage      Task Processing    Session/Cache
-        │                    │                    │
-        └────────────────────┼────────────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │ Mail Service    │
-                    │ (SendGrid)      │
-                    │ Port: 8001      │
-                    └─────────────────┘
-                             │
-                    ┌────────▼────────┐
-                    │  SendGrid API   │
-                    │  Email Delivery │
-                    └─────────────────┘
-
-        ┌─────────────────────────────────────┐
-        │   External Services                 │
-        ├─────────────────────────────────────┤
-        │ • VideoSDK - Live Video/Audio       │
-        │ • SendGrid - Email Provider         │
-        │ • MongoDB Atlas - Cloud Database    │
-        └─────────────────────────────────────┘
-```
+<p align="center">
+  <img src="chatapp_real_architecture.svg" width="800"/>
+</p>
 
 ### Backend Technologies
 
