@@ -31,7 +31,7 @@ Microservices-based chat & calling platform. Real-time messaging, voice/video ca
   <img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="60"/>
   &nbsp;&nbsp;&nbsp;
 
-  <img src="https://camo.githubusercontent.com/aea88ea1298578df183d68b79dab6a8aa3f32bfa5ff358939672ea364517cdb3/68747470733a2f2f7374617469632e766964656f73646b2e6c6976652f766964656f73646b5f6c6f676f5f776562736974655f626c61636b2e706e67" width="60"/>
+  <img src="https://docs.videosdk.live/img/videosdklive-thumbnail.jpg" width="60"/>
   &nbsp;&nbsp;&nbsp;
 
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" width="60"/>
