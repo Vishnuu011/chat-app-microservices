@@ -7,13 +7,15 @@ import { Avatar } from '../common/Avatar';
 
 interface CallHistoryPanelProps {
   onClose: () => void;
+  /** Present only on phones — takes the user back to the chat list instead of closing in place. */
+  onBack?: () => void;
 }
 
 interface EnrichedCall extends CallHistoryItem {
   otherUserInfo?: User;
 }
 
-export const CallHistoryPanel: React.FC<CallHistoryPanelProps> = ({ onClose }) => {
+export const CallHistoryPanel: React.FC<CallHistoryPanelProps> = ({ onClose, onBack }) => {
   const { callHistory, setCallHistory } = useCallStore();
   const { user } = useAuthStore();
   const [enriched, setEnriched] = useState<EnrichedCall[]>([]);
@@ -67,7 +69,7 @@ export const CallHistoryPanel: React.FC<CallHistoryPanelProps> = ({ onClose }) =
   return (
     <div style={styles.panel}>
       <div style={styles.header}>
-        <button style={styles.backBtn} onClick={onClose}>
+        <button style={styles.backBtn} onClick={onBack || onClose}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <polyline points="15 18 9 12 15 6" />
           </svg>
@@ -117,13 +119,13 @@ export const CallHistoryPanel: React.FC<CallHistoryPanelProps> = ({ onClose }) =
 
 const styles: Record<string, React.CSSProperties> = {
   panel: { flex: 1, display: 'flex', flexDirection: 'column', background: '#0b141a', animation: 'slideIn 0.2s' },
-  header: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--bg-header)', borderBottom: '1px solid var(--border)' },
-  backBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 4, display: 'flex' },
+  header: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', paddingTop: 'calc(12px + env(safe-area-inset-top))', background: 'var(--bg-header)', borderBottom: '1px solid var(--border)', flexShrink: 0 },
+  backBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, display: 'flex' },
   title: { fontWeight: 700, fontSize: 17 },
-  list: { flex: 1, overflowY: 'auto' },
+  list: { flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch' as const },
   center: { display: 'flex', alignItems: 'center', justifyContent: 'center', height: 200 },
   spinner: { width: 28, height: 28, border: '3px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
-  callItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'default' },
+  callItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', minHeight: 44, borderBottom: '1px solid rgba(255,255,255,0.03)', cursor: 'default' },
   callInfo: { flex: 1 },
   callTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
   callName: { fontWeight: 600, fontSize: 14 },

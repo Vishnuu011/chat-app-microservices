@@ -10,6 +10,7 @@ import { useCallStore, useAuthStore } from '../../store';
 import { endCall } from '../../api';
 import { emitEndCall } from '../../hooks/useCallSocket';
 import { Avatar } from '../common/Avatar';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SDK facts confirmed from dist/index.modern.js:
@@ -106,6 +107,7 @@ const LocalParticipantTile: React.FC<{ participantId: string; callType: 'audio' 
 // ── Controls ──────────────────────────────────────────────────────────────────
 const Controls: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> = ({ callType, onEnd }) => {
   const { localMicOn, localWebcamOn, toggleMic, toggleWebcam } = useMeeting();
+  const isMobile = useIsMobile();
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -116,14 +118,16 @@ const Controls: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> = (
   const fmt = (s: number) =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
+  const btnSize = isMobile ? 48 : 52;
+
   return (
-    <div style={ctrlS.bar}>
-      <span style={ctrlS.timer}>{fmt(elapsed)}</span>
-      <div style={ctrlS.btns}>
+    <div style={{ ...ctrlS.bar, height: isMobile ? 72 : 80, padding: isMobile ? '0 12px' : '0 24px', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <span style={{ ...ctrlS.timer, left: isMobile ? 12 : 24, fontSize: isMobile ? 12 : 14 }}>{fmt(elapsed)}</span>
+      <div style={{ ...ctrlS.btns, gap: isMobile ? 10 : 14 }}>
 
         {/* Mic */}
         <button
-          style={{ ...ctrlS.btn, background: localMicOn ? 'rgba(255,255,255,0.15)' : '#ef4444' }}
+          style={{ ...ctrlS.btn, width: btnSize, height: btnSize, background: localMicOn ? 'rgba(255,255,255,0.15)' : '#ef4444' }}
           onClick={() => toggleMic()}
           title={localMicOn ? 'Mute' : 'Unmute'}
         >
@@ -144,7 +148,7 @@ const Controls: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> = (
         {/* Camera */}
         {callType === 'video' && (
           <button
-            style={{ ...ctrlS.btn, background: localWebcamOn ? 'rgba(255,255,255,0.15)' : '#ef4444' }}
+            style={{ ...ctrlS.btn, width: btnSize, height: btnSize, background: localWebcamOn ? 'rgba(255,255,255,0.15)' : '#ef4444' }}
             onClick={() => toggleWebcam()}
             title={localWebcamOn ? 'Stop Camera' : 'Start Camera'}
           >
@@ -163,7 +167,7 @@ const Controls: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> = (
 
         {/* End call */}
         <button
-          style={{ ...ctrlS.btn, background: '#ef4444' }}
+          style={{ ...ctrlS.btn, width: btnSize, height: btnSize, background: '#ef4444' }}
           onClick={onEnd}
           title="End Call"
         >
@@ -187,6 +191,8 @@ const MeetingRoom: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> 
     onMeetingLeft: onEnd,
     onError: (err: any) => console.error('[VideoSDK]', err),
   });
+  const isMobile = useIsMobile();
+  const pipSize = isMobile ? { width: 104, height: 138 } : { width: 150, height: 94 };
 
   // SDK puts local in participants map — exclude it
   const localId = localParticipant?.id;
@@ -217,7 +223,7 @@ const MeetingRoom: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> 
             </div>
             {/* Show local in small card while waiting */}
             {localId && callType === 'video' && (
-              <div style={roomS.pipWaiting}>
+              <div style={{ ...roomS.pipWaiting, ...pipSize }}>
                 <LocalParticipantTile participantId={localId} callType={callType} small />
               </div>
             )}
@@ -243,7 +249,7 @@ const MeetingRoom: React.FC<{ callType: 'audio' | 'video'; onEnd: () => void }> 
 
             {/* Local PiP bottom-right */}
             {localId && (
-              <div style={roomS.pip}>
+              <div style={{ ...roomS.pip, ...pipSize }}>
                 <LocalParticipantTile participantId={localId} callType={callType} small />
               </div>
             )}
@@ -308,12 +314,14 @@ export const CallWindow: React.FC = () => {
 const rootS: Record<string, React.CSSProperties> = {
   overlay: {
     position: 'fixed', inset: 0, zIndex: 9999,
+    height: '100dvh',
     background: '#0d1117',
     display: 'flex', flexDirection: 'column',
     fontFamily: 'var(--font)',
   },
   header: {
     flexShrink: 0, padding: '10px 18px',
+    paddingTop: 'calc(10px + env(safe-area-inset-top))',
     background: 'rgba(255,255,255,0.04)',
     borderBottom: '1px solid rgba(255,255,255,0.06)',
     display: 'flex', alignItems: 'center',

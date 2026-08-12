@@ -5,9 +5,10 @@ import { format } from 'date-fns';
 interface MessageBubbleProps {
   message: Message;
   isOwn: boolean;
+  isMobile?: boolean;
 }
 
-export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) => {
+export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn, isMobile }) => {
   const time = format(new Date(message.createdAt), 'HH:mm');
 
   const renderContent = () => {
@@ -17,7 +18,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) 
           <img
             src={message.file.url}
             alt="img"
-            style={{ maxWidth: 220, maxHeight: 200, borderRadius: 8, display: 'block', cursor: 'pointer' }}
+            style={{ maxWidth: 'min(220px, 60vw)', width: '100%', maxHeight: 200, borderRadius: 8, display: 'block', cursor: 'pointer', objectFit: 'cover' }}
             onClick={() => window.open(message.file!.url, '_blank')}
           />
           {message.text && <p style={{ marginTop: 4, fontSize: 13 }}>{message.text}</p>}
@@ -26,7 +27,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) 
     }
     if (message.messageType === 'video' && message.file) {
       return (
-        <video controls style={{ maxWidth: 220, borderRadius: 8 }} src={message.file.url} />
+        <video controls style={{ maxWidth: 'min(220px, 60vw)', width: '100%', borderRadius: 8 }} src={message.file.url} />
       );
     }
     if (message.messageType === 'document' && message.file) {
@@ -45,7 +46,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwn }) 
 
   return (
     <div style={{ display: 'flex', justifyContent: isOwn ? 'flex-end' : 'flex-start', marginBottom: 2 }}>
-      <div style={{ ...styles.bubble, ...(isOwn ? styles.ownBubble : styles.otherBubble) }}>
+      <div
+        style={{
+          ...styles.bubble,
+          maxWidth: isMobile ? '82%' : 320,
+          ...(isOwn ? styles.ownBubble : styles.otherBubble),
+        }}
+      >
         {renderContent()}
         <div style={styles.meta}>
           <span style={styles.time}>{time}</span>

@@ -20,6 +20,7 @@ app=fastapi.FastAPI(
 
 
 
+
 @app.on_event("startup")
 async def startup():
     await connectDB()
@@ -46,7 +47,7 @@ async def shutdown():
 
 
 allow_origins = [
-    "https://chat-app-frontend-deploy-ten.vercel.app"
+    "http://localhost:5173"
 ]
 
 
@@ -100,3 +101,4 @@ if __name__ == "__main__":
         port=8000,
         reload=True
     )
+

@@ -6,12 +6,14 @@ import { ChatItem, User } from '../../types';
 import { format } from 'date-fns';
 import { joinChatRoom, leaveChatRoom } from '../../hooks/useChatSocket';
 import toast from 'react-hot-toast';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
 interface SidebarProps {
   onCallHistoryClick: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onCallHistoryClick }) => {
+  const isMobile = useIsMobile();
   const { user, clearAuth } = useAuthStore();
   const { chats, setChats, setActiveChat, activeChat, onlineUsers, setMessages, setUnseenZero } = useChatStore();
   const [search, setSearch] = useState('');
@@ -76,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCallHistoryClick }) => {
   const myId = user?._id || user?.id || '';
 
   return (
-    <div style={styles.sidebar}>
+    <div style={{ ...styles.sidebar, ...(isMobile ? styles.sidebarMobile : null) }}>
       {/* Header */}
       <div style={styles.header}>
         <button onClick={() => setShowProfile(!showProfile)} style={styles.avatarBtn}>
@@ -177,12 +179,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCallHistoryClick }) => {
       {/* New Chat Modal */}
       {showNewChat && (
         <div style={styles.modal} onClick={() => setShowNewChat(false)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div
+            style={{ ...styles.modalContent, ...(isMobile ? styles.modalContentMobile : null) }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div style={styles.modalHeader}>
               <span style={{ fontWeight: 600 }}>New Chat</span>
               <button style={styles.iconBtn} onClick={() => setShowNewChat(false)}>✕</button>
             </div>
-            <div style={{ overflowY: 'auto', maxHeight: 360 }}>
+            <div style={{ overflowY: 'auto', maxHeight: isMobile ? '70vh' : 360 }}>
               {allUsers.length === 0 ? (
                 <div style={styles.emptyState}><p style={{ color: 'var(--text-muted)' }}>No users found</p></div>
               ) : (
@@ -205,8 +210,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onCallHistoryClick }) => {
 };
 
 const styles: Record<string, React.CSSProperties> = {
-  sidebar: { width: '360px', minWidth: '360px', background: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)', height: '100vh' },
-  header: { display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12, background: 'var(--bg-header)' },
+  sidebar: { width: '360px', minWidth: '360px', background: 'var(--bg-panel)', display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)', height: '100%' },
+  sidebarMobile: { width: '100%', minWidth: '100%', borderRight: 'none' },
+  header: { display: 'flex', alignItems: 'center', padding: '12px 16px', gap: 12, background: 'var(--bg-header)', paddingTop: 'calc(12px + env(safe-area-inset-top))' },
   headerTitle: { flex: 1, fontWeight: 700, fontSize: 18 },
   headerActions: { display: 'flex', gap: 4 },
   avatarBtn: { background: 'none', border: 'none', cursor: 'pointer', padding: 0 },
@@ -219,7 +225,7 @@ const styles: Record<string, React.CSSProperties> = {
   emptyState: { display: 'flex', flexDirection: 'column' as const, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 40, color: 'var(--text-muted)' },
   spinner: { width: 28, height: 28, border: '3px solid var(--border)', borderTopColor: 'var(--accent)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' },
   startBtn: { background: 'var(--accent)', color: 'white', border: 'none', borderRadius: 20, padding: '8px 20px', cursor: 'pointer', fontSize: 13 },
-  chatItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', cursor: 'pointer', transition: 'background 0.15s', borderBottom: '1px solid rgba(255,255,255,0.03)' },
+  chatItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', minHeight: 44, cursor: 'pointer', transition: 'background 0.15s', borderBottom: '1px solid rgba(255,255,255,0.03)', WebkitTapHighlightColor: 'transparent' },
   chatInfo: { flex: 1, minWidth: 0 },
   chatTop: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 },
   chatName: { fontWeight: 600, fontSize: 14, color: 'var(--text-primary)', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis' },
@@ -228,7 +234,18 @@ const styles: Record<string, React.CSSProperties> = {
   chatPreview: { fontSize: 12, color: 'var(--text-secondary)', whiteSpace: 'nowrap' as const, overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 },
   badge: { background: 'var(--accent)', color: 'white', borderRadius: 10, fontSize: 11, fontWeight: 700, padding: '1px 6px', minWidth: 18, textAlign: 'center' as const, flexShrink: 0 },
   modal: { position: 'fixed' as const, inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  modalContent: { background: 'var(--bg-panel)', borderRadius: 12, width: 320, boxShadow: '0 8px 32px rgba(0,0,0,0.5)', animation: 'fadeIn 0.2s' },
+  modalContent: { background: 'var(--bg-panel)', borderRadius: 12, width: 320, maxWidth: '90vw', boxShadow: '0 8px 32px rgba(0,0,0,0.5)', animation: 'fadeIn 0.2s' },
+  // On phones, present as a bottom sheet instead of a floating centered card.
+  modalContentMobile: {
+    width: '100%',
+    maxWidth: '100%',
+    borderRadius: '16px 16px 0 0',
+    position: 'absolute' as const,
+    bottom: 0,
+    left: 0,
+    paddingBottom: 'env(safe-area-inset-bottom)',
+    animation: 'slideUp 0.25s ease',
+  },
   modalHeader: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderBottom: '1px solid var(--border)' },
-  userItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', cursor: 'pointer', transition: 'background 0.15s' },
+  userItem: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', minHeight: 44, cursor: 'pointer', transition: 'background 0.15s' },
 };

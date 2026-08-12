@@ -5,8 +5,15 @@ import { MessageBubble } from './MessageBubble';
 import { Avatar } from '../common/Avatar';
 import { emitTyping, emitStopTyping } from '../../hooks/useChatSocket';
 import toast from 'react-hot-toast';
+import { useIsMobile } from '../../hooks/useMediaQuery';
 
-export const ChatWindow: React.FC = () => {
+interface ChatWindowProps {
+  /** Present only on phones — takes the user back to the chat list. */
+  onBack?: () => void;
+}
+
+export const ChatWindow: React.FC<ChatWindowProps> = ({ onBack }) => {
+  const isMobile = useIsMobile();
   const { user } = useAuthStore();
   const { activeChat, messages, onlineUsers, typingUsers, addMessage, updateChatLatest } = useChatStore();
   const { setActiveCall } = useCallStore();
@@ -124,6 +131,13 @@ export const ChatWindow: React.FC = () => {
     <div style={styles.window}>
       {/* Chat Header */}
       <div style={styles.header}>
+        {onBack && (
+          <button style={styles.backBtn} onClick={onBack} title="Back">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+          </button>
+        )}
         <Avatar name={otherUser?.name || 'U'} size={40} online={isOtherOnline} />
         <div style={styles.headerInfo}>
           <span style={styles.headerName}>{otherUser?.name}</span>
@@ -150,7 +164,7 @@ export const ChatWindow: React.FC = () => {
       </div>
 
       {/* Messages */}
-      <div style={styles.messages}>
+      <div style={{ ...styles.messages, padding: isMobile ? '10px 10px' : '12px 16px' }}>
         {dateGroups.map((group) => (
           <div key={group.date}>
             <div style={styles.dateDivider}>
@@ -159,7 +173,7 @@ export const ChatWindow: React.FC = () => {
               </span>
             </div>
             {group.messages.map((msg) => (
-              <MessageBubble key={msg.id} message={msg} isOwn={msg.sender === myId} />
+              <MessageBubble key={msg.id} message={msg} isOwn={msg.sender === myId} isMobile={isMobile} />
             ))}
           </div>
         ))}
@@ -218,21 +232,22 @@ const styles: Record<string, React.CSSProperties> = {
   emptyContent: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 },
   emptyTitle: { fontSize: 24, fontWeight: 700, color: 'var(--text-primary)' },
   emptySubtitle: { color: 'var(--text-secondary)', fontSize: 14 },
-  header: { display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', background: 'var(--bg-header)', borderBottom: '1px solid var(--border)', zIndex: 1 },
-  headerInfo: { flex: 1 },
-  headerName: { display: 'block', fontWeight: 600, fontSize: 15 },
+  header: { display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', paddingTop: 'calc(10px + env(safe-area-inset-top))', background: 'var(--bg-header)', borderBottom: '1px solid var(--border)', zIndex: 1, flexShrink: 0 },
+  backBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 6, marginLeft: -6, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 },
+  headerInfo: { flex: 1, minWidth: 0 },
+  headerName: { display: 'block', fontWeight: 600, fontSize: 15, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   headerStatus: { display: 'block', fontSize: 12, color: 'var(--text-secondary)' },
-  callBtns: { display: 'flex', gap: 4 },
+  callBtns: { display: 'flex', gap: 4, flexShrink: 0 },
   callBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 8, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  messages: { flex: 1, overflowY: 'auto', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 2 },
+  messages: { flex: 1, overflowY: 'auto', WebkitOverflowScrolling: 'touch', padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: 2 },
   dateDivider: { display: 'flex', justifyContent: 'center', margin: '8px 0' },
   dateLabel: { background: 'rgba(17,27,33,0.9)', color: 'var(--text-secondary)', fontSize: 11, padding: '4px 10px', borderRadius: 8 },
   typingIndicator: { display: 'flex', gap: 4, padding: '8px 14px', background: 'var(--bg-message-in)', borderRadius: '8px 8px 8px 2px', width: 58, alignSelf: 'flex-start', marginTop: 2 },
   typingDot: { width: 8, height: 8, background: 'var(--text-secondary)', borderRadius: '50%', animation: 'waveTyping 1.2s infinite' },
   filePreview: { display: 'flex', alignItems: 'center', gap: 8, padding: '8px 16px', background: 'var(--bg-panel)', borderTop: '1px solid var(--border)' },
-  removeFileBtn: { background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 16 },
-  inputArea: { display: 'flex', alignItems: 'flex-end', gap: 8, padding: '8px 12px', background: 'var(--bg-panel)', borderTop: '1px solid var(--border)' },
-  attachBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 8, flexShrink: 0 },
+  removeFileBtn: { background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 16, padding: 8 },
+  inputArea: { display: 'flex', alignItems: 'flex-end', gap: 8, padding: '8px 12px', paddingBottom: 'calc(8px + env(safe-area-inset-bottom))', background: 'var(--bg-panel)', borderTop: '1px solid var(--border)', flexShrink: 0 },
+  attachBtn: { background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', padding: 8, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' },
   textInput: { flex: 1, background: 'var(--bg-input)', border: 'none', borderRadius: 20, padding: '10px 16px', color: 'var(--text-primary)', fontSize: 14, outline: 'none', resize: 'none', maxHeight: 100, lineHeight: 1.4 },
-  sendBtn: { width: 42, height: 42, background: 'var(--accent)', borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'opacity 0.2s' },
+  sendBtn: { width: 42, height: 42, minWidth: 42, background: 'var(--accent)', borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'opacity 0.2s' },
 };
